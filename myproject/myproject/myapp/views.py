@@ -44,9 +44,6 @@ def contact(request):
 def search(request):
     return render_to_response('myapp/search.html')
 
-#def upload(request):
-#    return render_to_response('myapp/upload.html')
-
 def index(index):
     return render_to_response('myapp/index.html')
 
