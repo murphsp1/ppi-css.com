@@ -111,13 +111,13 @@ def calculate_asa(atoms, probe, n_sphere_point=960):
     return areas
 
 
-def main():
+def main_function(file_and_path):
     import sys
     import getopt
     import molecule
 
 
-    usage = \
+    #usage = \
     """
 
     Copyright (c) 2007 Bosco Ho
@@ -137,7 +137,7 @@ def main():
 
     """
 
-    opts, args = getopt.getopt(sys.argv[1:], "n:")
+    #opts, args = getopt.getopt(sys.argv[1:], "n:")
     #if len(args) < 1:
     #    print usage
     #    return
@@ -145,25 +145,25 @@ def main():
 
 
     #mol = molecule.Molecule(args[0])
-    mol = molecule.Molecule('test.pdb')
+    mol = molecule.Molecule(file_and_path)
 
     atoms = mol.atoms()
     molecule.add_radii(atoms)
 
     n_sphere = 960
-    for o, a in opts:
-        if '-n' in o:
-            n_sphere = int(a)
-            print "Points on sphere: ", n_sphere
+    #for o, a in opts:
+    #    if '-n' in o:
+    #        n_sphere = int(a)
+    #        print "Points on sphere: ", n_sphere
     asas = calculate_asa(atoms, 1.4, n_sphere)
     print "%.1f angstrom squared." % sum(asas)
 
-    if len(args) > 1:
-        for asa, atom in zip(asas, atoms):
-            atom.bfactor = asa
-        mol.write_pdb(args[1])
+    #if len(args) > 1:
+    #    for asa, atom in zip(asas, atoms):
+    #        atom.bfactor = asa
+    #    mol.write_pdb(args[1])
 
 
-if __name__ == "__main__":
-    print "in main"
-    main()
+#if __name__ == "__main__":
+#    print "in main"
+#    main()

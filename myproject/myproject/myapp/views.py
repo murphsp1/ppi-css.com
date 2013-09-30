@@ -3,11 +3,17 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 
+import simplejson
 
-from myproject.myapp.models import Document
+from .models import Document
 from myproject.myapp.forms import DocumentForm
-from myproject.myapp.models import Scores
+from .models import Scores
+#from .models.zippp.asa import asa
+#import myproject.myapp.zippp.molecule.Molecule
+from .zippp import asa
+from django.conf import settings
 
 
 
@@ -18,6 +24,15 @@ def upload(request):
         if form.is_valid():
             newdoc = Document(docfile = request.FILES['docfile'])
             newdoc.save()
+
+
+            #newscore = Scores(name = 'test', score = 999.1, interface='A:YourMom')
+            #newscore.save()
+            filename = request.FILES['docfile'].name
+            path = settings.MEDIA_ROOT
+            file_and_path = path + '/documents/' + filename
+            print(file_and_path)
+            asa.main_function(file_and_path)
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('myproject.myapp.views.upload'))
@@ -49,3 +64,32 @@ def index(index):
 
 def hello_world(request):
     return HttpResponse("<h1>Hello, world.</h1>")    
+
+#This view simply dumps the current Scores table  
+def get_table_data(request):
+    # get the objects you wish to return
+    scores = Scores.objects.filter()
+    # construct a list which will contain all of the data for the response
+    to_json = []
+    for score in scores:
+        to_json.append([score.name, score.interface, score.score])
+
+    # convert the list to JSON
+    response_data = simplejson.dumps({"aaData" : to_json})
+
+    # return an HttpResponse with the JSON and the correct MIME type
+    return HttpResponse(response_data, mimetype='application/json')
+
+
+def init_table_data_load(request):
+    import csv
+    data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/myapp/static/csv/energies_merged.csv","rU")
+    cr = csv.reader(data_file)
+    for row in cr:
+        newscore = Scores(name = row[0], score = row[2], interface=row[1])
+        newscore.save()
+
+    data_file.close()
+    return HttpResponse("<h1>Data Uploaded Successfully</h1>")
+
+
