@@ -158,24 +158,26 @@ def evalMuPotential(protein, sa_protein, ligand, sa_ligand, max_distance):
                     atom_type_min = atom_0_type
                     atom_type_max = atom_1_type
                 
-                surface_contact_atoms.append((contact_tuple[0].getSerial(), contact_tuple[1].getSerial(), atom_type_min, atom_type_max))
+                surface_contact_atoms.append((contact_tuple[0].getSerial(), contact_tuple[1].getSerial(), atom_type_min, atom_type_max, muPotential[atom_type_min][atom_type_max]))
    
     sct = sortContactTuple(surface_contact_tuple)
     sca = sortContactAtoms(surface_contact_atoms)
 
     pdb_id = protein.getTitle().split()[0]
     
-    #contact_file = 'con_' + pdb_id + '.dat'
-    #jm = open(contact_file)
+    contact_file = 'con_' + pdb_id + '.dat'
+    #jm_sca = getJMContacts(contact_file)
     
-    #jm_sca = []
-    #for jj in jm:
-        #rr = jj.split()
-        #jm_sca.append((int(rr[0]), int(rr[1].rstrip(':')), int(rr[2]), int(rr[3])))
-  
-    #dbg.set_trace()
-
     return  np.dot(muPotential.flatten(), countArray.flatten())
+
+def getJMContacts(contact_file):
+
+    jm = open(contact_file)
+    jm_sca = []
+    for jj in jm:
+        rr = jj.split()
+        jm_sca.append((int(rr[0]), int(rr[1].rstrip(':')), int(rr[2]), int(rr[3]), float(rr[4])))
+    return jm_sca
 
 def sortContactAtoms(contact_tuples):
     return sorted(contact_tuples, key=lambda tup: (tup[0], tup[1]))
@@ -255,7 +257,7 @@ def scoreBenchmark():
 
     resultsFile = open('mu-scores.txt', 'w+')
 
-    csvReader  = csv.reader(open('score_decomp.csv', 'rU'))
+    csvReader  = csv.reader(open('mu-pot.out', 'rU'))
     csvReader2 = csv.reader(open('kastritis_bench.csv', 'rU'))
 
     benchmark_data = dict()
@@ -266,6 +268,7 @@ def scoreBenchmark():
     columns= csvReader.next()
 
     for row in csvReader:
+        dbg.set_trace()
         PDB = dy.parsePDB(str(row[0]))
 
         chains_list = benchmark_data[row[0]].split(':')
@@ -287,19 +290,24 @@ def scoreBenchmark():
         resultsFile.write(str(row[0]) + ' :  ' + str(EC) + '\n')
         print str(row[0]) + ':  ' + str(EC)
 
-def scoreBenchMark2():
+def scoreBenchmark2():
+    
+    dy.confProDy(verbosity='none')
 
     resultsFile = open('mu-scores.txt', 'w+')
-    csvReader  = csv.reader(open('mupot_re2.csv', 'rU'))
-    check = ('1EFN', '1NW9', '1JTG', '1HE8')
+    csvReader  = csv.reader(open('mu-pot.out', 'rU'))
 
     for row in csvReader:
-        PDB_ID = row[0]
-        jm_score = float(row[1])
+        rsplit = row[0].split('=')
+
+        PDB_ID = rsplit[0].split()[0]
+        jm_score = float(rsplit[1])
         EC = scoreOne(PDB_ID)
-        if EC is not 'not in bench' and abs(EC-jm_score) > 0.1:
+        
+        if EC != 'not in bench':
             print  PDB_ID + " Diff: " + str( abs(EC - jm_score)) +  "  My score: " + str(EC) + " JM score: " + str(jm_score) 
-            resultsFile.write(PDB_ID + " Diff: " + str( abs(EC - float(jm_score))) +  "  My score: " + str(EC) + " JM score: " + str(jm_score) + '\n')
+            if abs(EC-jm_score) > 0.1:
+                resultsFile.write(PDB_ID + " Diff: " + str( abs(EC - float(jm_score))) +  "  My score: " + str(EC) + " JM score: " + str(jm_score) + '\n')
 
     resultsFile.close()
 
@@ -324,12 +332,12 @@ def scoreOne(PDB_FILENAME):
     try: 
         benchmark_data[PDB.getTitle()]
         chains_list = sorted(benchmark_data[PDB.getTitle()].split(':'))
-        print chains_list
+    
     except KeyError:
         return 'not in bench'
         #chains_list = ['A','B']
 
-
+    #dbg.set_trace()
     protein, ligand  = getChains(PDB, chains_list[0], chains_list[1])
     ligand_ASA_indicator   = determineSurfaceAtoms(ligand, ligand.getMasses(), 0.2)
     protein_ASA_indicator  = determineSurfaceAtoms(protein, protein.getMasses(), 0.2)
@@ -339,23 +347,10 @@ def scoreOne(PDB_FILENAME):
 
 def main():
     
-    #scoreBenchMark2()
-    EC = scoreOne("dimers/1XD3.pdb")
-    print EC
-    EC = scoreOne("dimers/1R0R.pdb")
-    print EC
-
+    scoreBenchmark2()
+    #print scoreOne('dimers/2SIC.pdb')
     #plotMuPotential()
 
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
 
