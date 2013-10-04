@@ -15,6 +15,72 @@ import math
 from scipy.spatial.distance import cdist
 
 
+def get_radii_from_prody_pdb(pdb):
+    '''
+    This is a helper function to avoid using the molecule
+    class and handle AtomGroup classes from prody after
+    a parsePDB loads a PDB from disk.
+    '''
+
+    #Keep import local as prody has lots of junk
+    import prody as pr
+
+    #Avoiding another static file in the web app
+    atom_radii = { 
+    'H': 1.20,
+    'N': 1.55,
+    'NA': 2.27,
+    'CU': 1.40,
+    'CL': 1.75,
+    'C': 1.70,
+    'O': 1.52,
+    'I': 1.98,
+    'P': 1.80,
+    'B': 1.85,
+    'BR': 1.85,
+    'S': 1.80,
+    'SE': 1.90,
+    'F': 1.47,
+    'FE': 1.80,
+    'K':  2.75,
+    'MN': 1.73,
+    'MG': 1.73,
+    'ZN': 1.39,
+    'HG': 1.8,
+    'XE': 1.8,
+    'AU': 1.8,
+    'LI': 1.8,
+    '.': 1.8
+    }
+
+    two_char_elements = [el for el, r in atom_radii.items() if len(el) == 2]
+
+    names = pdb.getNames()
+
+    elements = []
+
+    for name in names:
+        element = ''
+        for c in name:
+            if not c.isdigit() and c != " ":
+                element += c
+        if element[:2] in two_char_elements:
+            element = element[:2]
+        else:
+            element = element[0]
+        elements.append(element)
+
+    radii = []
+    for element in elements:
+        if element in atom_radii:
+            r = atom_radii[element]
+        else:
+            r = atom_radii['.']
+        radii.append(r)
+
+    return(np.array(radii))
+
+
 def generate_sphere_points(n):
     """
     Returns list of 3d coordinates of points on a sphere using the
@@ -91,25 +157,28 @@ def find_neighbor_indices_np2(dist_sq, radii, probe, k):
 
 
 #@profile
-def calculate_asa_np(atoms, probe, n_sphere_point=960):
+def calculate_asa_np(pdb, probe, n_sphere_point=960):
     """
     Returns list of accessible surface areas of the atoms, using the probe
     and atom radius to define the surface.
     """
     sphere_points = generate_sphere_points(n_sphere_point)
 
-    radii = np.array([a.radius for a in atoms])
-    radii_plus_probe_sq = (radii + probe)**2
+    #points = np.array([ [a.pos.x, a.pos.y, a.pos.z] for a in atoms ])
+    points = pdb.getCoords()
 
-    points = np.array([ [a.pos.x, a.pos.y, a.pos.z] for a in atoms ])
+    radii = get_radii_from_prody_pdb(pdb)
+
+    #radii = np.array([a.radius for a in atoms])
+    radii_plus_probe_sq = (radii + probe)**2
 
     dist_matrix_sq = cdist(points, points, 'sqeuclidean')
 
     const = 4.0 * math.pi / n_sphere_point
 
-    areas = np.zeros(len(atoms))
+    areas = np.zeros(len(pdb))
 
-    for i, atom_i in enumerate(atoms):
+    for i in xrange(0,len(pdb)):
 
         neighbor_indices = find_neighbor_indices_np2(dist_matrix_sq[i,:], radii, probe, i)
 
@@ -142,8 +211,8 @@ def calculate_asa_np(atoms, probe, n_sphere_point=960):
 def main():
     import sys
     import getopt
-    import molecule
     import csv
+    import prody as pr
 
 
     #usage = \
@@ -174,10 +243,11 @@ def main():
 
 
     #mol = molecule.Molecule(args[0])
-    mol = molecule.Molecule('dimers/1R0R.pdb')
+    #pdb = molecule.Molecule('dimers/1R0R.pdb')
+    pdb = pr.parsePDB('dimers/1R0R.pdb')
 
-    atoms = mol.atoms()
-    molecule.add_radii(atoms)
+    #atoms = mol.atoms()
+    #molecule.add_radii(atoms)
 
     data = []
 
@@ -186,10 +256,10 @@ def main():
     #        n_sphere = int(a)
     #        print "Points on sphere: ", n_sphere
     #
-    n_sphere = [500]
-    #n_sphere = range(10,2000,10)
+    #n_sphere = [500]
+    n_sphere = range(10,2000,10)
     for n in n_sphere:
-        asas = calculate_asa_np(atoms, 1.4, n)
+        asas = calculate_asa_np(pdb, 1.4, n)
         data.append(asas)
         #print "%i, %.1f angstrom squared." % n, sum(asas)
         print(str(n) + ", " + str(sum(asas)) + " angstrom squared.")
