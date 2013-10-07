@@ -1,8 +1,11 @@
 Django==1.5.4
 South==0.8.2
 Werkzeug==0.9.4
+django-datatables-view==1.6
 django-extensions==1.2.2
 numpy==1.7.1
 psycopg2==2.5.1
+scipy==0.12.0
+simplejson==3.3.0
 six==1.4.1
 wsgiref==0.1.2
