@@ -12,7 +12,7 @@ from myproject.myapp.forms import DocumentForm
 from .models import Scores
 #from .models.zippp.asa import asa
 #import myproject.myapp.zippp.molecule.Molecule
-from .zippp import asa
+#from .zippp import asa
 from django.conf import settings
 
 
@@ -72,7 +72,7 @@ def get_table_data(request):
     # construct a list which will contain all of the data for the response
     to_json = []
     for score in scores:
-        to_json.append([score.name, score.interface, score.score])
+        to_json.append([score.name, score.interface, "{0:.2f}".format(score.score)])
 
     # convert the list to JSON
     response_data = simplejson.dumps({"aaData" : to_json})

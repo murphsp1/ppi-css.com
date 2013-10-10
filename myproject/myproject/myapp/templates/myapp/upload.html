@@ -6,7 +6,8 @@
 	<div class="row">
 		<div class="span10 offset1">
 			<h2>Upload PDB to Compute the Predicted Binding Energy</h2>
-			<p>If the PDB you are looking for was not found in the database, please upload the PDB here.</p>
+			<p>If you would like to compute the estimated &Delta;G for a PDB and interface not found in our database, please upload the PDB here.</p>
+			<p>Please note that the PDB must only contain two the PDB you are looking for was not found in the database, please upload the PDB here.</p>
 		
 			<!-- List of uploaded documents -->
 			{% if documents %}
@@ -27,7 +28,7 @@
 					{{ form.docfile.errors }}
 					{{ form.docfile }}
 				</p>
-				<p><input type="submit" value="Upload" /></p>
+				<p><input class="btn btn-large btn-primary" type="submit" value="Upload" /></p>
 			</form>
 		</div>
 	</div>
