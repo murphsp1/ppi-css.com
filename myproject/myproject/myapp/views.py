@@ -12,9 +12,10 @@ from myproject.myapp.forms import DocumentForm
 from .models import Scores
 #from .models.zippp.asa import asa
 #import myproject.myapp.zippp.molecule.Molecule
-#from .zippp import asa
+#import myproject.myapp.zippp.mu-pot as mu_pot
+#from zippp.mu_pot import mu_pot
+import zippp.mu_pot as mu_pot
 from django.conf import settings
-
 
 
 def upload(request):
@@ -32,7 +33,10 @@ def upload(request):
             path = settings.MEDIA_ROOT
             file_and_path = path + '/documents/' + filename
             print(file_and_path)
-            asa.main_function(file_and_path)
+            #asa.main_function(file_and_path)
+
+            score = mu_pot.scoreOne(file_and_path)
+            print(score)
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('myproject.myapp.views.upload'))
@@ -80,7 +84,7 @@ def get_table_data(request):
     # return an HttpResponse with the JSON and the correct MIME type
     return HttpResponse(response_data, mimetype='application/json')
 
-
+'''
 def init_table_data_load(request):
     import csv
     data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/myapp/static/csv/energies_merged.csv","rU")
@@ -91,5 +95,5 @@ def init_table_data_load(request):
 
     data_file.close()
     return HttpResponse("<h1>Data Uploaded Successfully</h1>")
-
+'''
 

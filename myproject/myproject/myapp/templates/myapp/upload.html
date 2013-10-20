@@ -10,6 +10,7 @@
 			<p>Please note that the PDB must only contain two the PDB you are looking for was not found in the database, please upload the PDB here.</p>
 		
 			<!-- List of uploaded documents -->
+			<!--
 			{% if documents %}
 				<ul>
 				{% for document in documents %}
@@ -19,6 +20,7 @@
 			{% else %}
 				<p>No documents.</p>
 			{% endif %}
+			-->
 
 			<!-- Upload form. Note enctype attribute! -->
 			<form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
