@@ -12,6 +12,7 @@ sudo apt-get install gfortran
 
 sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
+sudo pip install prody
 
 
 #Install the web server to serve pages
@@ -156,4 +157,20 @@ Shall the new role be allowed to create databases? (y/n) n
 Shall the new role be allowed to create more new roles? (y/n) n
 
 vi /etc/postgresql/9.1/main/pg_hba.conf
+
+
+
+
+
+# New Debug 'cause server ain't working
+
+Is server running?
+sudo service apache2 status
+
+What do the apache error logs say?
+cat /var/log/apache2/error.log
+
+gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
+
+gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
 

@@ -14,6 +14,11 @@ framework.
 
 """
 import os
+import sys
+import site
+
+sys.path.append('/home/seanmurphy/myproject/myproject')
+sys.path.append('/home/seanmurphy/myproject')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
 

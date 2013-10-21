@@ -87,6 +87,8 @@ def get_table_data(request):
 '''
 def init_table_data_load(request):
     import csv
+    #for remote server
+    data_file = open("/home/seanmurphy/myproject/myproject/myproject/myapp/static/csv/energies_merged.csv","rU")
     data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/myapp/static/csv/energies_merged.csv","rU")
     cr = csv.reader(data_file)
     for row in cr:
