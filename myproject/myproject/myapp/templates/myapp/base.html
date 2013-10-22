@@ -11,6 +11,7 @@
 		<style type="text/css" title="currentStyle">
 			@import "{% static "css/demo_page.css" %}";
 			@import "{% static "css/demo_table.css" %}";
+			@import "{% static "media/css/TableTools.css" %}";
 		</style>
 		<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
 		<style type="text/css">
@@ -69,13 +70,15 @@
 	      	font-size: 80%;
 	      }
 
-	  </style>
+		</style>
 
 
-	  <style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; }[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; }[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; }[touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }</style>
+	 	<style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; }[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; }[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; }[touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }</style>
 
-	  <script type="text/javascript" language="javascript" src="{% static "js/jquery.js" %}"></script>
-	  <script type="text/javascript" language="javascript" src="{% static "js/jquery.dataTables.js" %}"></script>	
+	 	<script type="text/javascript" language="javascript" src="{% static "js/jquery.js" %}"></script>
+		<script type="text/javascript" language="javascript" src="{% static "js/jquery.dataTables.js" %}"></script>
+	 	<script type="text/javascript" charset="utf-8" src="{% static "media/js/ZeroClipboard.js" %}"></script>
+		<script type="text/javascript" charset="utf-8" src="{% static "media/js/TableTools.js" %}"></script>	
 	  <script src ="{% static "js/bootstrap.min.js" %}"></script>
 	  <!--<script src ="{% static "js/energies.js" %}"></script>-->
 	  <script type="text/javascript" charset="utf-8">
@@ -83,15 +86,33 @@
 	  	$(document).ready(function() {
 	  		$('#dynamic').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
 	  		$('#example').dataTable( {
+	  			"sDom": 'T<"clear">lfrtip',	  			
 	  			//"aaData": aDataSet,
+	  			"oTableTools": {
+					"sSwfPath": "{% static "media/swf/copy_csv_xls.swf" %}"
+				},
 	  			"aoColumns": [
 	  			{ "sTitle": "PDB" , "sClass": "center"},
 	  			{ "sTitle": "Interface" , "sClass": "center"},
 	  			{ "sTitle": "&Delta;G {Estimated}", "sClass": "center" }
 	  			],
 	  			"bProcessing": true,
-	  			"sAjaxSource" : "/myapp/get_table_data"
-	  			//"sAjaxSource": "{% static "js/energies_ajax.txt" %}"
+	  			"sAjaxSource" : "/myapp/get_table_data",
+/*				"oTableTools": {
+					"aButtons": [
+					{
+						"sExtends": "copy",
+						"sButtonText": "Copy to clipboard"
+					},
+					{
+						"sExtends": "csv",
+						"sButtonText": "Save to CSV"
+					},
+					{
+						"sExtends": "xls",
+						"sButtonText": "Save for Excel"
+					}] 
+				}*/
 	  		} );	
 	  	} );
 	  </script>
