@@ -682,6 +682,9 @@ def scoreOne(PDB_FILENAME):
     
     PDB = dy.parsePDB(PDB_FILENAME)
     #PDB = dy.parsePDB('./dimers/'+ PDB_FILENAME + '.pdb')
+
+    PDB_ID = PDB.getTitle()
+
     PDB = PDB.select('stdaa and noh').copy()
 
     chains_list = np.unique(PDB.getChids())
@@ -743,7 +746,12 @@ def scoreOne(PDB_FILENAME):
     bias = -9.168165335
 
     #return feature_vector
-    return np.dot(feature_vector, weights_vector) + bias
+    #return np.dot(feature_vector, weights_vector) + bias
+
+    ddg_est =  np.dot(feature_vector, weights_vector) + bias
+    return_tuple = (PDB_ID, str(chains_list[0] + ':' + chains_list[1]), str(ddg_est) )
+    return(return_tuple)
+    
 
 def main():
     
