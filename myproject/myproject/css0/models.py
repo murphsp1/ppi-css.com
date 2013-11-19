@@ -9,4 +9,6 @@ class Scores(models.Model):
 	name = models.CharField(max_length=30)
 	score = models.FloatField()
 	interface = models.CharField(max_length=30)
+	uploaded = models.BooleanField(default=False) 
+	date_uploaded = models.DateTimeField(auto_now_add=False)
 

@@ -65,9 +65,7 @@ def search(request):
 
 def index(index):
     return render_to_response('css0/index.html')
-
-def hello_world(request):
-    return HttpResponse("<h1>Hello, world.</h1>")    
+   
 
 #This view simply dumps the current Scores table  
 def get_table_data(request):
@@ -84,7 +82,7 @@ def get_table_data(request):
     # return an HttpResponse with the JSON and the correct MIME type
     return HttpResponse(response_data, mimetype='application/json')
 
-'''
+
 def init_table_data_load(request):
     import csv
     #for remote server
@@ -92,10 +90,10 @@ def init_table_data_load(request):
     data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/css0/static/csv/energies_merged.csv","rU")
     cr = csv.reader(data_file)
     for row in cr:
-        newscore = Scores(name = row[0], score = row[2], interface=row[1])
+        newscore = Scores(name = row[0], score = row[2], interface=row[1], upoad=False)
         newscore.save()
 
     data_file.close()
     return HttpResponse("<h1>Data Uploaded Successfully</h1>")
-'''
+
 
