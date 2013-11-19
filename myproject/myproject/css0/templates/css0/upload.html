@@ -12,17 +12,7 @@
 				<strong>Note: Uploaded PDB must contain only two chains.</strong>
 			</div>	
 			<!-- List of uploaded documents -->
-			<!--
-			{% if documents %}
-				<ul>
-				{% for document in documents %}
-					<li><a href="{{ document.docfile.url }}">{{ document.docfile.name }}</a></li>
-				{% endfor %}
-				</ul>
-			{% else %}
-				<p>No documents.</p>
-			{% endif %}
-			-->
+			
 
 			<!-- Upload form. Note enctype attribute! -->
 			<form action="{% url 'upload' %}" method="post" enctype="multipart/form-data">{% csrf_token %}
@@ -34,6 +24,23 @@
 				</p>
 				<p><input class="btn btn-large btn-primary" type="submit" value="Upload" /></p>
 			</form>
+
+			{% if scores %}
+			<div class="alert alert-success">
+				<h2>Your PDB was successfully uploaded.</h2>
+				<p>The computed results are below:</p>
+				{% for s in scores %}
+				<ul>
+					<li>Name = {{ s.name}}</li>
+					<li>Interface = {{ s.interface }}</li>
+					<li>Score = <strong>{{ s.score }}</strong></li>
+				</ul>
+				{% endfor %}
+			</div>
+
+			{% endif %}
+
+
 		</div>
 	</div>
 

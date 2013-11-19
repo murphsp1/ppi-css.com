@@ -15,3 +15,10 @@
 	./manage.py schemamigration css0 --auto
 	./manage.py migrate css0   
 
+## Relevant GIT commands
+
+I find I only use the following three commit commands:
+
+	git add .
+	git commit -m "blah blah blah"
+	git push -u origin master

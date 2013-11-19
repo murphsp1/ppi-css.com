@@ -742,8 +742,13 @@ def scoreOne(PDB_FILENAME):
     # arrange features and set fitted weights 
     feature_vector = np.array([mu, deltaASA_Tyr, deltaASA_Ser, deltaASA_Cys])
 
-    weights_vector = [0.001607683, 0.006278654, 0.016471769, 0.026061642]
-    bias = -9.168165335
+    #Old
+    #weights_vector = [0.001607683, 0.006278654, 0.016471769, 0.026061642]
+    #bias = -9.168165335
+
+    #New - 
+    weights_vector = [0.00160383620921846, 0.00638908613212121, 0.0176168750693056, 0.0263422755351373]
+    bias = -9.08150020679505
 
     #return feature_vector
     #return np.dot(feature_vector, weights_vector) + bias
