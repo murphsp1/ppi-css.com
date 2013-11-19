@@ -3,7 +3,7 @@ from django.conf.urls.defaults import patterns, url
 
 urlpatterns = patterns('myproject.css0.views',
     #url(r'^list/$', 'list', name='list'),
-    url(r'^hello_world/$', 'hello_world'),
+    #url(r'^hello_world/$', 'hello_world'),
     url(r'^index/$','index'),
     url(r'^/$', 'index'),
 	url(r'^upload/$','upload', name='upload'),

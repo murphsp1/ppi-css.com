@@ -10,10 +10,6 @@ import simplejson
 from .models import Document
 from myproject.css0.forms import DocumentForm
 from .models import Scores
-#from .models.zippp.asa import asa
-#import myproject.css0.zippp.molecule.Molecule
-#import myproject.css0.zippp.mu-pot as mu_pot
-#from zippp.mu_pot import mu_pot
 import zippp.mu_pot as mu_pot
 from django.conf import settings
 
@@ -35,8 +31,13 @@ def upload(request):
             print(file_and_path)
             #asa.main_function(file_and_path)
 
-            score = mu_pot.scoreOne(file_and_path)
-            print(score)
+            output_tuple = mu_pot.scoreOne(file_and_path)
+            print('PDB Name = ' + output_tuple[0])
+            print('PDB Interface = ' + output_tuple[1])
+            print('EST DeltaG = '+ str(output_tuple[2]) )
+            newscore = Scores(name = output_tuple[0], score = output_tuple[2], interface=output_tuple[1], uploaded=True)
+            newscore.save()
+
 
             # Redirect to the document list after POST
             return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
