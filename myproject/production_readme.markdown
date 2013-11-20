@@ -29,7 +29,7 @@ sudo apt-get install mysql-server
 mysql_secure_installation
 sudo apt-get install python-mysqldb
 
-mysql --user=root --password=spm5555
+mysql --user=root --password=INSERT PASSWORD
 mysql> create database django_test;
 
 I then had to remove stuff from requirements including psycopg2
