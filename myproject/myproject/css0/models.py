@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils.timezone import utc
 import datetime
 
 class Document(models.Model):
@@ -11,5 +12,5 @@ class Scores(models.Model):
 	score = models.FloatField()
 	interface = models.CharField(max_length=30)
 	uploaded = models.BooleanField(default=False) 
-	date_uploaded = models.DateTimeField(default=datetime.datetime.now())
-
+	#date_uploaded = models.DateTimeField(default=datetime.datetime.now())
+	date_uploaded = models.DateTimeField(default = datetime.datetime.utcnow().replace(tzinfo=utc))

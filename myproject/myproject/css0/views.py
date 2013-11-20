@@ -16,7 +16,7 @@ from django.conf import settings
 
 def upload(request):
     # Handle file upload
-    scores = None
+    success = False
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
@@ -38,11 +38,10 @@ def upload(request):
             print('EST DeltaG = '+ str(output_tuple[2]) )
             newscore = Scores(name = output_tuple[0], score = output_tuple[2], interface=output_tuple[1], uploaded=True)
             newscore.save()
-            scores = newscore
-
+            success=True
 
             # Redirect to the document list after POST
-            return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
+            #return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
             
     else:
         form = DocumentForm() # A empty, unbound form
@@ -51,8 +50,14 @@ def upload(request):
     #documents = Document.objects.all()
 
     #print(scores)
-
-    scores = Scores.objects.all().order_by('date_uploaded').reverse()[:1]
+    scores = None
+    print('Sean LOOK HERE!!!!')
+    print(success)
+    if (success):
+        #scores = Scores.objects.all().order_by('date_uploaded').reverse()[:1]
+        scores = Scores.objects.latest('id')
+        scores = [scores]
+        print(scores)
     
     # Render list page with the documents and the form
     return render_to_response(
@@ -93,7 +98,7 @@ def init_table_data_load(request):
     import csv
     #for remote server
     data_file = open("/home/seanmurphy/myproject/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
-    data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
+    #data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
     cr = csv.reader(data_file)
     for row in cr:
         newscore = Scores(name = row[0], score = row[2], interface=row[1], upoad=False)
