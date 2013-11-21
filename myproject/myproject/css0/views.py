@@ -97,11 +97,12 @@ def get_table_data(request):
 def init_table_data_load(request):
     import csv
     #for remote server
-    data_file = open("/home/seanmurphy/myproject/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
-    #data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
+    #data_file = open("/home/seanmurphy/myproject/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
+    data_file = open("/Users/seanmurphy/Desktop/ProphecyWebService/django/for_django_1-5/myproject/myproject/css0/static/csv/webpage_DB.csv","rU")
     cr = csv.reader(data_file)
     for row in cr:
-        newscore = Scores(name = row[0], score = row[2], interface=row[1], upoad=False)
+        print(row[2])
+        newscore = Scores(name = row[0], score = float(row[2]), interface=row[1], uploaded=False)
         newscore.save()
 
     data_file.close()

@@ -174,3 +174,35 @@ gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
 
 gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
 
+
+# Every Deployment
+
+need to restart apache2
+	
+	sudo service apache2 restart
+	
+	./manage.py schemamigration css0 --auto
+	./manage.py migrate css0   
+
+
+log in and drop the table in the database
+
+	mysql -u root -pPASSWORD -h HOSTNAMEORIP django_test
+
+	drop table _______;
+css0_scores
+
+need to give permission to write to the directory for the user that will be writing files
+
+drwxrwxrwx 2 seanmurphy seanmurphy   4096 Nov 20 18:51 .
+
+drwxr-xr-x 3 seanmurphy seanmurphy   4096 Nov 20 15:35 ..
+
+-rw-r--r-- 1 **www-data   www-data   136748 Nov 20 18:51 1FC2.pdb**
+
+-rw-r--r-- 1 seanmurphy seanmurphy   6148 Nov 20 15:35 .DS_Store
+
+
+Things to fix. Deployments generally suck. Something always breaks. 
+
+Initial table data load is NOT working ... which is really odd.
