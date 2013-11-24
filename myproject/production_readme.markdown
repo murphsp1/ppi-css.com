@@ -1,3 +1,6 @@
+static IP = 162.222.181.45
+
+## Update the Instance ##
 sudo apt-get update
 sudo apt-get upgrade
 
@@ -7,7 +10,7 @@ sudo apt-get install python-setuptools
 sudo easy_install pip
 sudo pip install virtualenv
 
-#Throw on a fortran compiler for attempting to install scipy in virtualenv
+## Install Numpy and Scipy (SciPy requires Fortran compiler) ##
 sudo apt-get install gfortran
 
 sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
@@ -15,25 +18,64 @@ sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython
 sudo pip install prody
 
 
-#Install the web server to serve pages
+## Install the Web Server (Apache2) ##
+This is a very basic tutorial that doesn't get into the details of configuring the address
+https://developers.google.com/compute/docs/quickstart
+
+Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  See here for more details:
+
+http://www.control-escape.com/web/configuring-apache2-debian.html
+
+
 sudo apt-get install apache2 libapache2-mod-wsgi
 
+By default, the following page is served by the install:
+
+    /usr/share/apache2/default-site/index.html
+
+Now we need to update the virtual hosts settings on the server.  For Debian, this is here:
+/etc/apache2/sites-enabled/000-default 
 
 
-/usr/share/apache2/default-site/index.html:<p>This is the default web page for this server.</p>
+Restart the service
+
+    sudo service apache2 restart 
+
+ERROR MESSAGES:
+[....] Restarting web server: apache2apache2: apr_sockaddr_info_get() failed for (none)
+apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
+ ... waiting apache2: apr_sockaddr_info_get() failed for (none)
+apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
+. ok 
+Setting up ssl-cert (1.0.32) ...
+hostname: Name or service not known
+
+### Need to do Configuration Work ###
+
+sudo vi /etc/apache2/sites-available/default
+plus edit the wsgi.py file
+
+http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
 
 
-#Install Mysql
+
+
+## Install and Configure the Database (MySQL) ##
 
 sudo apt-get install mysql-server
+- create a root password
+
 mysql_secure_installation
+- type in your password and then answer all questions "Y"
+
 sudo apt-get install python-mysqldb
 
 mysql --user=root --password=INSERT PASSWORD
 mysql> create database django_test;
+mysql> quit;
 
-I then had to remove stuff from requirements including psycopg2
 
+## Grab the Django App from GitHub
 
 git clone https://github.com/murphsp1/myproject.git
 
@@ -51,16 +93,13 @@ http://192.158.29.226/myapp/init_table_data_load/
 
 but need to update the original source to have a proper path
 
+From the command line in the directory with "manage.py" type:
 
-python manage.py syncdb
-python manage.py migrate
+    python manage.py syncdb
+    python manage.py migrate
 
 
 
-sudo vi /etc/apache2/sites-available/default
-plus edit the wsgi.py file
-
-http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
 
 
 
@@ -88,7 +127,7 @@ sudo apt-get install python-virtualenv
 sudo pip install -r ./requirements.txt 
 
 
-#need to install webserver and mod-wsgi
+
 
 
 
@@ -97,6 +136,7 @@ sudo pip install -r ./requirements.txt
 
 /home/seanmurphy/myproject/myproject/myproject
 
+## GCE - Only Need to Do 
 #need to configure GCE firewall settings
 gcutil addfirewall http2 --description="Incoming http allowed." --allowed="tcp:http" --project="1040981951502"
 
