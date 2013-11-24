@@ -1,3 +1,5 @@
+The commands needed to launch various components on the development machine.
+
 ## Start postgres
 
 	postgres -D /usr/local/var/postgres 

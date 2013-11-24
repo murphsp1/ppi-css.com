@@ -1,4 +1,27 @@
-static IP = 162.222.181.45
+astatic IP = 162.222.181.45
+## Overall Structure on the remote server ##
+
+
+/var/www/ppi-css.com
+/var/www/ppi-css.com/htdocs
+/var/www/ppi-css.com/django
+var/www/ppi-css.com/logs
+
+The application gets cloned into /var/www/ppi-css.com/django
+
+
+so what goes in htdocs?
+ Benjamin:  and apache should only serve from /var/www/ppi-css.com/htdocs
+static files
+javascript, css, images
+usuually you have a static and a media folder in that directory
+you run the command ./manage.py collectstatic 
+to move teh static files from your app to the hosted directory
+that's what the aliases for /static and /media are for in the apache configuration
+
+
+
+
 
 ## Update the Instance ##
 sudo apt-get update
