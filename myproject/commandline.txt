@@ -1,5 +1,0 @@
-#Start postgres
-postgres -D /usr/local/var/postgres 
-
-python manage.py runserver_plus      
-
