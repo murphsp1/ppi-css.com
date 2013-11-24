@@ -1,0 +1,181 @@
+	{% load staticfiles %} 
+
+	<!DOCTYPE html>
+	<html lang="en">
+	<head>		
+		<title>PPI CSS Version 2.0</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="">
+		<meta name="author" content="">
+
+		<style type="text/css" title="currentStyle">
+			@import "{% static "css/demo_page.css" %}";
+			@import "{% static "css/demo_table.css" %}";
+			@import "{% static "media/css/TableTools.css" %}";
+		</style>
+		<link href="{% static "css/bootstrap.min.css" %}" rel="stylesheet" media="screen">
+		<style type="text/css">
+
+	      /* Sticky footer styles
+	      -------------------------------------------------- */
+
+	      html,
+	      body {
+	      	height: 100%;
+	      	/* The html and body elements cannot have any padding or margin. */
+	      }
+
+	      /* Wrapper for page content to push down footer */
+	      #wrap {
+	      	min-height: 100%;
+	      	height: auto !important;
+	      	height: 100%;
+	      	/* Negative indent footer by it's height */
+	      	margin: 0 auto -60px;
+	      }
+
+	      /* Set the fixed height of the footer here */
+	      #push,
+	      #footer {
+	      	height: 60px;
+	      }
+	      #footer {
+	      	background-color: #f5f5f5;
+	      }
+
+	      /* Lastly, apply responsive CSS fixes as necessary */
+	      @media (max-width: 767px) {
+	      	#footer {
+	      		margin-left: -20px;
+	      		margin-right: -20px;
+	      		padding-left: 20px;
+	      		padding-right: 20px;
+	      	}
+	      }
+
+
+
+	      /* Custom page CSS
+	      -------------------------------------------------- */
+	      /* Not required for template or sticky footer method. */
+
+	      #wrap > .container {
+	      	padding-top: 60px;
+	      }
+	      .container .credit {
+	      	margin: 20px 0;
+	      }
+
+	      code {
+	      	font-size: 80%;
+	      }
+
+		</style>
+
+
+	 	<style>[touch-action="none"]{ -ms-touch-action: none; touch-action: none; }[touch-action="pan-x"]{ -ms-touch-action: pan-x; touch-action: pan-x; }[touch-action="pan-y"]{ -ms-touch-action: pan-y; touch-action: pan-y; }[touch-action="scroll"],[touch-action="pan-x pan-y"],[touch-action="pan-y pan-x"]{ -ms-touch-action: pan-x pan-y; touch-action: pan-x pan-y; }</style>
+
+	 	<script type="text/javascript" language="javascript" src="{% static "js/jquery.js" %}"></script>
+		<script type="text/javascript" language="javascript" src="{% static "js/jquery.dataTables.js" %}"></script>
+	 	<script type="text/javascript" charset="utf-8" src="{% static "media/js/ZeroClipboard.js" %}"></script>
+		<script type="text/javascript" charset="utf-8" src="{% static "media/js/TableTools.js" %}"></script>	
+	  <script src ="{% static "js/bootstrap.min.js" %}"></script>
+	  <!--<script src ="{% static "js/energies.js" %}"></script>-->
+	  <script type="text/javascript" charset="utf-8">
+
+	  	$(document).ready(function() {
+	  		$('#dynamic').html( '<table cellpadding="0" cellspacing="0" border="0" class="display" id="example"></table>' );
+	  		$('#example').dataTable( {
+	  			"sDom": 'T<"clear">lfrtip',	  			
+	  			//"aaData": aDataSet,
+	  			"oTableTools": {
+					"sSwfPath": "{% static "media/swf/copy_csv_xls.swf" %}"
+				},
+	  			"aoColumns": [
+	  			{ "sTitle": "PDB" , "sClass": "center"},
+	  			{ "sTitle": "Interface" , "sClass": "center"},
+	  			{ "sTitle": "&Delta;G {Estimated}", "sClass": "center" }
+	  			],
+	  			"bProcessing": true,
+	  			"sAjaxSource" : "/css0/get_table_data",
+/*				"oTableTools": {
+					"aButtons": [
+					{
+						"sExtends": "copy",
+						"sButtonText": "Copy to clipboard"
+					},
+					{
+						"sExtends": "csv",
+						"sButtonText": "Save to CSV"
+					},
+					{
+						"sExtends": "xls",
+						"sButtonText": "Save for Excel"
+					}] 
+				}*/
+	  		} );	
+	  	} );
+	  </script>
+	</head>
+
+	<body>
+		<div id="StayFocusd-infobar" style="display: none; top: 0px;">
+			<img src="chrome-extension://laankejkbhbdhmipfmgcngdelahlfoji/common/img/eye_19x19_red.png">
+			<span id="StayFocusd-infobar-msg"></span>
+			<span id="StayFocusd-infobar-links">
+				<a href="http://getbootstrap.com/2.3.2/examples/sticky-footer-navbar.html#" id="StayFocusd-infobar-never-show">hide forever</a>&nbsp;&nbsp;|&nbsp;&nbsp;
+				<a href="http://getbootstrap.com/2.3.2/examples/sticky-footer-navbar.html#" id="StayFocusd-infobar-hide">hide once</a>
+			</span>
+		</div>
+
+
+		<!-- Part 1: Wrap all page content here -->
+		<div id="wrap">
+
+			<!-- Fixed navbar -->
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<a class="brand">PPI-CSS</a>
+						<div class="nav-collapse collapse">
+{% block nav %}
+							<ul class="nav">
+								<li class="{% block index %}{% endblock %}"><a href="/css0/index/">Home</a></li>
+								<li class="{% block search %}{% endblock %}"><a href="/css0/search/">Search</a></li>
+								<li class="{% block upload %}{% endblock %}"><a href="/css0/upload">Upload</a></li>
+								<li class="{% block contact %}{% endblock %}"><a href="/css0/contact">Contact</a></li>
+							</ul>
+{% endblock %}
+						</div><!--/.nav-collapse -->
+					</div>
+				</div>
+			</div>
+
+			<!-- Begin page content -->
+			<div class="container">
+				<div class="page-header">
+					<h1>css0: A Fast Predictor of Protein Binding Energy at a Proteomic Scale</h1>
+				</div>
+				{% block primary %} {% endblock %}
+
+			</div>
+
+			<div id="push"></div>
+		</div>
+
+
+
+
+		<div id="footer">
+			<div class="container">
+				<p class="muted_credit">Copyright 2013 - Sean Patrick Murphy</p>
+			</div>
+		</div>
+
+	</body>
+</html>
