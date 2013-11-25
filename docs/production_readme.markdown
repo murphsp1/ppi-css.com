@@ -1,60 +1,55 @@
-astatic IP = 162.222.181.45
-## Overall Structure on the remote server ##
 
 
-/var/www/ppi-css.com
-/var/www/ppi-css.com/htdocs/static
-/var/www/ppi-css.com/htdocs/media
-/var/www/ppi-css.com/django
-var/www/ppi-css.com/logs
 
-The application gets cloned into /var/www/ppi-css.com/django
+## Introduction ##
 
 
-so what goes in htdocs?
- Benjamin:  and apache should only serve from /var/www/ppi-css.com/htdocs
-static files
-javascript, css, images
-usuually you have a static and a media folder in that directory
-you run the command ./manage.py collectstatic 
-to move teh static files from your app to the hosted directory
-that's what the aliases for /static and /media are for in the apache configuration
-
- sudo cp ppi-css.conf /etc/apache2/sites-available/ppi-css.com
-
-    sudo a2ensite ppi-css.com
-
-Enabling site ppi-css.com.
-To activate the new configuration, you need to run:
-  service apache2 reload
-    
-    sudo service apache2 reload
-
-Then I added the following line:
-
-ServerName localhost
-
-to the /etc/apache2/apache.conf file
 
 
-sudo apt-get install apache2-prefork-dev
-sudo apt-get install make
 
-## Update the Instance ##
-sudo apt-get update
-sudo apt-get upgrade
 
-sudo apt-get install git
+## 0. Initial Configuration ##
 
-sudo apt-get install python-setuptools
-sudo easy_install pip
-sudo pip install virtualenv
+I have noticed a great deal of tutorial blogs don't offer much in the way of detailed environment specifications used for the tutorial and do no want to go down the same path.
 
-## Install Numpy and Scipy (SciPy requires Fortran compiler) ##
+
+
+static IP = 162.222.181.45
+
+
+
+## 1. Update the Instance and Install Tools ##
+After the instance boots, we must ssh in to the instance for the first time via:
+
+
+Next, we need to update the default packages install on the virtual instance:
+
+    sudo apt-get update
+    sudo apt-get upgrade
+
+and install some basic needed development tools:
+
+    sudo apt-get install make
+    sudo apt-get install wget
+    sudo apt-get install git
+
+and install some basic Python-related tools:
+
+    sudo apt-get install python-setuptools
+    sudo easy_install pip
+    sudo pip install virtualenv
+
+## 2. Install Numpy and Scipy (SciPy requires Fortran compiler) ##
+
+To install SciPy, Python's general purpose scientific computing library from which we need a single function, we need the Fortran compiler
     
     sudo apt-get install gfortran
 
+and then we need Numpy and Scipy and everything else
+
     sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+
+Finally, we need to add ProDy, a protein dynamics and sequence analysis package for Python.
 
     sudo pip install prody
 
@@ -63,16 +58,52 @@ Remove all of the various bits and pieces for numpy and scipy from the requireme
     sudo pip install -r ./requirements.txt
 
 
+## Install and Configure the Database (MySQL) ##
+
+    sudo apt-get install mysql-server
+
+The installation process should prompt you to create a root password. Please do so for security purposes.
+
+Next, we are going to execute a script to secure the MySQL installation:
+
+    mysql_secure_installation
+
+You already have a root password from the installation process but otherwise answer "Y" to every question.
+
+With the DB installed, we now need to create our database for Django (mine is creatively called django_test). Please note that there must not be a space between "--password=" and your password on the command line.
+
+    mysql --user=root --password=INSERT PASSWORD
+    mysql> create database django_test;
+    mysql> quit;
+
+Finally for this step we need the MySQL database connector for Python which will be used by our Django app:
+
+    sudo apt-get install python-mysqldb
+
+Note: why did I got with MySQL instead of Postgres? The simple reason was that it took fewer steps to get the MySQL server up and running than the Postgres server. I actually run Postgres on my development machine.
+
+
 ## Install the Web Server (Apache2) ##
-This is a very basic tutorial that doesn't get into the details of configuring the address
+You have seemingly two choices for your web server, either the tried and true Apache (now up to version 2+) or nginx. <a href="http://wiki.nginx.org/Main" target="_blank">Nginex</a> is supposed to be the new sexy when it comes to web servers but 
+
+
+### A Simple Tutorial for GCE ###
+This is a very basic tutorial that doesn't get into the details of getting a very simple configuration up and running on GCE. 
+
 https://developers.google.com/compute/docs/quickstart
 
+### Some Background on Apache Configuration Files on Debian ###
 Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  See here for more details:
 
 http://www.control-escape.com/web/configuring-apache2-debian.html
 
 
-sudo apt-get install apache2 libapache2-mod-wsgi
+    sudo apt-get install apache2 
+
+    libapache2-mod-wsgi
+
+    sudo apt-get install apache2-prefork-dev
+
 
 By default, the following page is served by the install:
 
@@ -105,24 +136,71 @@ http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
 
 
 
-## Install and Configure the Database (MySQL) ##
 
-sudo apt-get install mysql-server
-- create a root password
 
-mysql_secure_installation
-- type in your password and then answer all questions "Y"
+## Setup the Overall Directory Structure on the Remote Server ##
 
-sudo apt-get install python-mysqldb
+I have seen many conflicting recommendations in online tutorials about how to best layout a Django application in development. It would appear that after you have built your first dozen or so Django projects, you start formulating your own opinions and create a standard project structure for yourself. 
 
-mysql --user=root --password=INSERT PASSWORD
-mysql> create database django_test;
-mysql> quit;
+Obviously, this experiential knowledge is not available to someone building and deploying one of their first sites 
+
+And, your directory structure directly impacts yours app's routings and the daunting-at-first settings.py file. If you move around a few directories, things tend to stop working.
+
+The picture gets even murkier when you go from development to production and I have found much less discussion on best practices here. Luckily, I could ping on my friend Ben Bengfort and tap into his devops knowledge.  The directory structure on the remote server looks like this as recommended by Ben Bengfort. 
+
+    /var/www/ppi-css.com
+    /var/www/ppi-css.com/htdocs/static
+    /var/www/ppi-css.com/htdocs/media
+    /var/www/ppi-css.com/django
+    /var/www/ppi-css.com/logs
+
+Apache will see the htdocs directory as the main directory from which to serve files.
+
+static will contain the collected set of static files (images, css, javascript, and more) and media will contain uploaded documents.
+
+logs will contain relevant apache log files.
+
+django will contain the cloned copy of the Django project from Git Hub.
+
+The following shell commands get things setup correctly:
+
+    sudo mkdir /var/www/ppi-css.com
+    sudo mkdir /var/www/ppi-css.com/htdocs
+    sudo mkdir /var/www/ppi-css.com/htdocs/static
+    sudo mkdir /var/www/ppi-css.com/htdocs/media
+    sudo mkdir /var/www/ppi-css.com/django
+    sudo mkdir /var/www/ppi-css.com/logs
+    cd /var/www/ppi-css.com/django
+    sudo git clone https://github.com/murphsp1/ppi-css.com.git
+
+There will be aliases in the virtual host configuration file that let the apache server know about this structure.
+
+
+
+
+
+ sudo cp ppi-css.conf /etc/apache2/sites-available/ppi-css.com
+
+    sudo a2ensite ppi-css.com
+
+Enabling site ppi-css.com.
+To activate the new configuration, you need to run:
+  service apache2 reload
+    
+    sudo service apache2 reload
+
+Then I added the following line:
+
+ServerName localhost
+
+to the /etc/apache2/apache.conf file
+
+
 
 
 ## Grab the Django App from GitHub
 
-git clone https://github.com/murphsp1/myproject.git
+
 
 edit the settings to reflect new database
 
@@ -221,27 +299,6 @@ Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL
 http://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/
 
 
-#need to install postgres ...
-sudo apt-get install postgresql
-sudo apt-get install libpq-dev
-sudo pip install psycopg2
-
-#need to setup postgres db and accounts
-sudo passwd postgres   #update postgres user passwrd
-
-seanmurphy@(none):~/myproject/myproject/myproject$ sudo su - postgres
-sudo: unable to resolve host (none)
-postgres@(none):~$ createdb test
-
-postgres@(none):~$ createuser -P
-Enter name of role to add: hello_django
-Enter password for new role: 
-Enter it again: 
-Shall the new role be a superuser? (y/n) n
-Shall the new role be allowed to create databases? (y/n) n
-Shall the new role be allowed to create more new roles? (y/n) n
-
-vi /etc/postgresql/9.1/main/pg_hba.conf
 
 
 
