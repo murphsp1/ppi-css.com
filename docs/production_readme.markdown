@@ -3,7 +3,8 @@ astatic IP = 162.222.181.45
 
 
 /var/www/ppi-css.com
-/var/www/ppi-css.com/htdocs
+/var/www/ppi-css.com/htdocs/static
+/var/www/ppi-css.com/htdocs/media
 /var/www/ppi-css.com/django
 var/www/ppi-css.com/logs
 
@@ -19,9 +20,25 @@ you run the command ./manage.py collectstatic
 to move teh static files from your app to the hosted directory
 that's what the aliases for /static and /media are for in the apache configuration
 
+ sudo cp ppi-css.conf /etc/apache2/sites-available/ppi-css.com
+
+    sudo a2ensite ppi-css.com
+
+Enabling site ppi-css.com.
+To activate the new configuration, you need to run:
+  service apache2 reload
+    
+    sudo service apache2 reload
+
+Then I added the following line:
+
+ServerName localhost
+
+to the /etc/apache2/apache.conf file
 
 
-
+sudo apt-get install apache2-prefork-dev
+sudo apt-get install make
 
 ## Update the Instance ##
 sudo apt-get update
@@ -34,11 +51,16 @@ sudo easy_install pip
 sudo pip install virtualenv
 
 ## Install Numpy and Scipy (SciPy requires Fortran compiler) ##
-sudo apt-get install gfortran
+    
+    sudo apt-get install gfortran
 
-sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+    sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
-sudo pip install prody
+    sudo pip install prody
+
+Remove all of the various bits and pieces for numpy and scipy from the requirements file and then do:
+
+    sudo pip install -r ./requirements.txt
 
 
 ## Install the Web Server (Apache2) ##
@@ -245,7 +267,7 @@ need to restart apache2
 	sudo service apache2 restart
 	
 	./manage.py schemamigration css0 --auto
-	./manage.py migrate css0   
+	s  
 
 
 log in and drop the table in the database
