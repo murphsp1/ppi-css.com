@@ -3,9 +3,16 @@
 
 ## Introduction ##
 
+General thoughts
 
+gap in tutorials .. some are too simplistic
+tech manuals and sdks are too technical and abstract
 
+be prepared to go through at least a few iterations ... this changes how you should work and think
 
+document everything
+
+you will get in trouble copying and pasting code and/or configuration files. However, understanding everything is not 
 
 
 ## 0. Initial Configuration ##
@@ -16,6 +23,10 @@ I have noticed a great deal of tutorial blogs don't offer much in the way of det
 
 static IP = 162.222.181.45
 
+
+## GCE - Only Need to Do 
+#need to configure GCE firewall settings
+gcutil addfirewall http2 --description="Incoming http allowed." --allowed="tcp:http" --project="1040981951502"
 
 
 ## 1. Update the Instance and Install Tools ##
@@ -29,38 +40,36 @@ Next, we need to update the default packages install on the virtual instance:
 
 and install some basic needed development tools:
 
-    sudo apt-get install make
-    sudo apt-get install wget
-    sudo apt-get install git
+    sudo apt-get --yes install make
+    sudo apt-get --yes install wget
+    sudo apt-get --yes install git
 
 and install some basic Python-related tools:
 
-    sudo apt-get install python-setuptools
+    sudo apt-get --yes install python-setuptools
     sudo easy_install pip
     sudo pip install virtualenv
+
+Note that in many of my sudo apt-get commands I include --yes. This flag just prevents me from having to type "Y" to agree to the download of a file.
 
 ## 2. Install Numpy and Scipy (SciPy requires Fortran compiler) ##
 
 To install SciPy, Python's general purpose scientific computing library from which we need a single function, we need the Fortran compiler
     
-    sudo apt-get install gfortran
+    sudo apt-get --yes install gfortran
 
 and then we need Numpy and Scipy and everything else
 
-    sudo apt-get install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
+    sudo apt-get --yes install python-numpy python-scipy python-matplotlib ipython ipython-notebook python-pandas python-sympy python-nose
 
 Finally, we need to add ProDy, a protein dynamics and sequence analysis package for Python.
 
     sudo pip install prody
 
-Remove all of the various bits and pieces for numpy and scipy from the requirements file and then do:
-
-    sudo pip install -r ./requirements.txt
-
 
 ## Install and Configure the Database (MySQL) ##
 
-    sudo apt-get install mysql-server
+    sudo apt-get --yes install mysql-server
 
 The installation process should prompt you to create a root password. Please do so for security purposes.
 
@@ -84,25 +93,70 @@ Note: why did I got with MySQL instead of Postgres? The simple reason was that i
 
 
 ## Install the Web Server (Apache2) ##
-You have seemingly two choices for your web server, either the tried and true Apache (now up to version 2+) or nginx. <a href="http://wiki.nginx.org/Main" target="_blank">Nginex</a> is supposed to be the new sexy when it comes to web servers but 
+You have seemingly two choices for your web server, either the tried and true Apache (now up to version 2+) or nginx. <a href="http://wiki.nginx.org/Main" target="_blank">Nginex</a> is supposed to be the new sexy when it comes to web servers but this newness comes at a price of less documentation/tutorials online. Thus, let's play it safe and go with Apach2.
 
 
-### A Simple Tutorial for GCE ###
-This is a very basic tutorial that doesn't get into the details of getting a very simple configuration up and running on GCE. 
 
-https://developers.google.com/compute/docs/quickstart
+### First Attempt ###
 
-### Some Background on Apache Configuration Files on Debian ###
-Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  See here for more details:
+First things first, we need to install apache2 and mod_wsgi. Mod_wsgi is an Apache HTTP server module that provides a WSGI compliant interface for web applications developed in Python. 
 
-http://www.control-escape.com/web/configuring-apache2-debian.html
+    sudo apt-get --yes install apache2 libapache2-mod-wsgi
 
+This seems to be causing a good number of problems. In my Django error logs I see:
 
-    sudo apt-get install apache2 
+    [Mon Nov 25 13:25:27 2013] [error] [client 108.21.2.20] Premature end of script headers: wsgi.py
+
+and in my 
+
+    cat /var/log/apache2/error.log
+
+I see things like:
+
+    [Sun Nov 24 16:15:02 2013] [warn] mod_wsgi: Compiled for Python/2.7.2+.
+    [Sun Nov 24 16:15:02 2013] [warn] mod_wsgi: Runtime using Python/2.7.3.
+
+with the occasional segfault:
+
+    [Mon Nov 25 00:02:55 2013] [notice] child pid 12532 exit signal Segmentation fault (11)
+    [Mon Nov 25 00:02:55 2013] [notice] seg fault or similar nasty error detected in the parent process
+
+### Second Attempt ###
+A little bit of Googling suggests that this could be the result of a number of issues with mod_wsgi
+
+Initially, I simulataneously installed libapache2-mod-wsgi but this potentially caused a large number of pr
 
     libapache2-mod-wsgi
 
+
     sudo apt-get install apache2-prefork-dev
+
+Now, we need to grab mod_wsgi:
+
+    wget https://modwsgi.googlecode.com/files/mod_wsgi-3.4.tar.gz
+
+    tar -zxvf mod_wsgi-3.4.tar.gz
+    cd mod_wsgi-3.4
+    ./configure
+    make
+    sudo make install
+
+Once mod_wsgi is intalled, the apache server needs to be told about it. On Apache 2, this is done by adding the load declaration and any configuration directives to the /etc/apache2/mods-available/ directory.
+
+The load declaration for the module needs to go on a file named wsgi.load (in /etc/apache2/mods-available/ directory), which contains only this:
+
+    LoadModule wsgi_module /usr/lib/apache2/modules/mod_wsgi.so
+
+Then you have to activate the wsgi module with:
+
+    a2enmod wsgi
+
+Note: a2enmod stands for "apache2 enable mod", this executable create the symlink for you. Actually a2enmod wsgi is equivalent to:
+
+    cd /etc/apache2/mods-enabled
+    ln -s ../mods-available/wsgi.load
+    ln -s ../mods-available/wsgi.conf # if it exists
+
 
 
 By default, the following page is served by the install:
@@ -117,25 +171,20 @@ Restart the service
 
     sudo service apache2 restart 
 
-ERROR MESSAGES:
-[....] Restarting web server: apache2apache2: apr_sockaddr_info_get() failed for (none)
-apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
- ... waiting apache2: apr_sockaddr_info_get() failed for (none)
-apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
-. ok 
-Setting up ssl-cert (1.0.32) ...
-hostname: Name or service not known
 
-### Need to do Configuration Work ###
 
-sudo vi /etc/apache2/sites-available/default
-plus edit the wsgi.py file
+sudo chown -R www-data:www-data /var/www
+
+
+
+
+
+### More References ###
 
 http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
 
-
-
-
+- <a href="https://developers.google.com/compute/docs/quickstart" target="_blank">A Simple Tutorial for GCE</a> - This is a very basic tutorial that doesn't get into the details of getting a very simple configuration up and running on GCE. 
+- <a href="http://www.control-escape.com/web/configuring-apache2-debian.html" target="_blank">Some Background on Apache Configuration Files on Debian</a> - Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  
 
 
 ## Setup the Overall Directory Structure on the Remote Server ##
@@ -173,36 +222,126 @@ The following shell commands get things setup correctly:
     cd /var/www/ppi-css.com/django
     sudo git clone https://github.com/murphsp1/ppi-css.com.git
 
-There will be aliases in the virtual host configuration file that let the apache server know about this structure.
+## Configuring Apache for Our Django Project ##
+
+First, let's disable the 
+
+    sudo a2dissite default
 
 
 
+There will be aliases in the virtual host configuration file that let the apache server know about this structure. Fortunately, I have included the ppi-css.conf file in the repository and it must be moved into position:
 
+    sudo cp /var/www/ppi-css.com/django/ppi-css.com/ppi-css.conf /etc/apache2/sites-available/ppi-css.com
 
- sudo cp ppi-css.conf /etc/apache2/sites-available/ppi-css.com
+Next, we must enable the site using the following command:
 
     sudo a2ensite ppi-css.com
 
-Enabling site ppi-css.com.
-To activate the new configuration, you need to run:
-  service apache2 reload
+and we must reload the apache2 service (remember this command as you will probably be using it alot)
     
     sudo service apache2 reload
 
-Then I added the following line:
+Now, when I restarted or reloaded the apache2 service, I get the following error message:
 
-ServerName localhost
+    ERROR MESSAGES:
+    [....] Restarting web server: apache2apache2: apr_sockaddr_info_get() failed for (none)
+    apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
+     ... waiting apache2: apr_sockaddr_info_get() failed for (none)
+    apache2: Could not reliably determine the server's fully qualified domain name, using 127.0.0.1 for ServerName
+    . ok 
+    Setting up ssl-cert (1.0.32) ...
+    hostname: Name or service not known
 
-to the /etc/apache2/apache.conf file
+To remove this, I simply added the following line:
+
+    ServerName localhost
+
+to the /etc/apache2/apache2.conf file using vi. A quick 
+
+    sudo service apache2 reload
+
+shows that the error message no longer appeared.
+
+## Install a Few More Python Packages ##
+
+Remove all of the various bits and pieces for numpy and scipy from the requirements file and then do:
+
+    sudo pip install -r /var/www/ppi-css.com/django/ppi-css.com/requirements.txt
+
+
+## Database Migrations ##
+
+Before we can perform the needed database migrations, we need to update the database section of settings.py. It should look like below:
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql', 
+            'USER': 'root',    
+            'PASSWORD': 'INSERT_YOUR_PASSWORD',
+            'HOST': '',         # Set to empty string for localhost. 
+            'PORT': '',         # Set to empty string for default.
+        }
+    }
+
+    python /var/www/ppi-css.com/django/ppi-css.com/manage.py syncdb
+    python /var/www/ppi-css.com/django/ppi-css.com/manage.py migrate
+
+
+## Deploying Your Static Files ##
+Static files, your css, javascript, images, and other unchanging files, can be problematic for new Django developers. When developing, Django is more than happy to serve your static files for you given their 
+
+The key to this is your settings.py file. In this file, we see:
+
+    # Absolute path to the directory static files should be collected to.
+    # Don't put anything in this directory yourself; store your static files
+    # in apps' "static/" subdirectories and in STATICFILES_DIRS.
+    # Example: "/home/media/media.lawrence.com/static/"
+    STATIC_ROOT = ''      #os.path.join(PROJECT_ROOT, 'static')
+
+    # URL prefix for static files.
+    # Example: "http://media.lawrence.com/static/"
+    STATIC_URL = '/static/'
+
+    # Additional locations of static files
+    STATICFILES_DIRS = (
+        #os.path.join(PROJECT_ROOT,'static'),
+        # Put strings here, like "/home/html/static" or "C:/www/django/static".
+        # Always use forward slashes, even on Windows.
+        # Don't forget to use absolute paths, not relative paths.
+    )      
+
+For production, STATIC_ROOT must contain the directory where Apache2 will serve static content from. In this case, it should look like this:
+
+    STATIC_ROOT = '/var/www/ppi-css.com/htdocs/static'
+
+For development, STATIC_ROOT looked like:
+
+    STATIC_ROOT = ''
+
+Next, Django comes with a handy mechanism to round up all of your static files (in the case that they are spread out in separate app directories if you have a number of apps in a single project) and push them to a single parent directory when you go into production.
+
+    ./manage.py collectstatic
+
+Be very careful when going into production.  If any of the directories listed in the STATICFILES_DIRS variable do not exist on your production server, collectstatic will fail and will not do so gracefully. The <a href="https://docs.djangoproject.com/en/dev/ref/contrib/staticfiles/" target="_blank">official Django documentation</a> has a pretty good description of the entire process.
 
 
 
+MUST UPDATE wsgi.py with directory paths!
 
-## Grab the Django App from GitHub
+What about media path??
 
 
+Update settings.py
+    MEDIA_ROOT = "/var/www/ppi-css.com/htdocs/media/" #os.path.join(PROJECT_ROOT, 'media')
 
-edit the settings to reflect new database
+
+    ALLOWED_HOSTS = [
+            '.ppi-css.com', 
+            'ppi-css.com',
+    ]
+
+
 
 
 WHERE wsgi.py is
@@ -218,8 +357,7 @@ but need to update the original source to have a proper path
 
 From the command line in the directory with "manage.py" type:
 
-    python manage.py syncdb
-    python manage.py migrate
+
 
 
 
@@ -234,7 +372,10 @@ Add a A record to the DNS record of your domain mapping the domain to the elasti
 Your domain provide should either give you some way to set the A record (the IP address), or it will give you a way to edit the nameservers of your domain.
 
 
+### Need to do Configuration Work ###
 
+sudo vi /etc/apache2/sites-available/default
+plus edit the wsgi.py file
 
 
 
@@ -259,9 +400,7 @@ sudo pip install -r ./requirements.txt
 
 /home/seanmurphy/myproject/myproject/myproject
 
-## GCE - Only Need to Do 
-#need to configure GCE firewall settings
-gcutil addfirewall http2 --description="Incoming http allowed." --allowed="tcp:http" --project="1040981951502"
+
 
 
 
