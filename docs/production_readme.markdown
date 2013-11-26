@@ -1,37 +1,23 @@
 ## Introduction ##
 This very long article, which might get broken down into multiple posts, walks one through the process of deploying a non-standard Django application on a virtual instance provisioned not from Amazon Web Services but from Google Compute Engine. Note that Google Compute Engine is very different from Google App Engine.  
 
-What makes this app "non-standard" is its use of both the numpy and scipy packages to perform fast numeric computations. Numpy and SciPy are based on C and Fortran respectively and both have "more" complicated compilation dependencies. Binaries may be available in some cases but I was most concerned with 
+What makes this app "non-standard" is its use of both the numpy and scipy packages to perform fast numeric computations. Numpy and SciPy are based on C and Fortran respectively and both have "more" complicated compilation dependencies. Binaries may be available in some cases but not always for your preferred deployment environmet. Most importantly, these two libraries prevented me from deploying my app to either Google App Engine (GAE) or to Heroku. Based on limited Googling, I am guessing that I might have been able to deploy (eventually) to Heroku with some extra work but I think the probability of success with GAE would have been even lower.
 
-A quick Googling of deploying these  
+In fact, GAE could have been an ideal solution if I had re-architected my app, separating the Django application from the computational code. I could have run the Django application on GAE and allowed the app to spin up a GCE instance as needed to perform the numeric computations. If the project deadline had not been so tight, I would go down this path for version 2.0.
 
+## Philosophy ##
+As you will notice, this post is a bit long and I wrote it for two very particular reasons.  First, I believe that a large gap exists between available online tutorials that walk you through the deployment of a toy-application and the core documentation that exists for programming languages and web frameworks. The tutorials are often so simple that they do not prepare you for the pitfalls and mandatory debugging that the novice or expert will often face. The core documentation is fantastic for the expert that already has a good understanding of how the larger pieces fit together. However, it is often very difficult to formulate the next question one must ask after reading the documention--you simply don't know what you don't know.
 
-While numpy and scipy are both great, they are often problematic as 
+Please note that this isn't to disparage the efforts of the tutorial writers or the language documenters in any way (Thank you for your efforts) and I won't speculate on the origins of this divide.
 
-
-General thoughts
-
-
-I wrote this for two very particular reasons.  The first reason is that I believe there is a large gap between available online tutorials that walk you through the deployment of a toy-application and the core documentation that exists for program
-
-I find that the 
-gap in tutorials .. some are too simplistic
-tech manuals and sdks are too technical and abstract
-
-
-
-Second, this is the document I created as I worked my way through this problem.
-gap in tutorials .. some are too simplistic
-tech manuals and sdks are too technical and abstract
+Second, this is the document that I created as I worked my way through the deployment. 
 
 
 Numerous tutorials of various depth and extent describe deploying a Django app into various environments. While these tutorials can be helpful, I found their short length somewhat disingenuous 
 
-Also, there is a fundamental disconnect between 
-and the actual process.
+
 
 A tutorial, with all steps sequentially laid out in detail, is not representative of how things occur in real life.
-
 
 
 be prepared to go through at least a few iterations ... this changes how you should work and think
@@ -40,8 +26,7 @@ document everything
 
 you will get in trouble copying and pasting code and/or configuration files. However, understanding everything is not 
 
-## Virtual Environment - Where Did It Go? ##
-If you noticed, I did have a requirements.txt file in my project. When I started doing local development on my trusty Mac Book Air, I used <a href="https://pypi.python.org/pypi/virtualenv" target="_blank">virtualenv</a>, an amazing tool. However, I had some difficulties getting Numpy and Scipy properly compiled and included in the virtualenv on my server whereas it was pretty simple to get them up and running in the system's default Python installation. Conversing with some of my more Django-experienced friends, they reassured me that while this wasn't a best practice, it wasn't a mortal sin either.
+
 
 
 ## Initial Configuration ##
@@ -49,7 +34,6 @@ If you noticed, I did have a requirements.txt file in my project. When I started
 One criticism that I have of **some** of the tutorial blogs that I have seen is that they don't always offer the intimate details of their production environments. I would like to see every technical blog come with a requirements.txt file.
 
 To remedy that, here are all of the sordid details:
-
 
 - gcutil version 1.11.0 - to connect to my GCE instance
 - 
@@ -375,9 +359,6 @@ Update settings.py
             'ppi-css.com',
     ]
 
-
-
-
 WHERE wsgi.py is
 /home/seanmurphy/myproject/myproject/myproject
 
@@ -394,6 +375,12 @@ From the command line in the directory with "manage.py" type:
 
 
 
+## Virtual Environment - Where Did It Go? ##
+If you noticed, I did have a requirements.txt file in my project. When I started doing local development on my trusty Mac Book Air, I used <a href="https://pypi.python.org/pypi/virtualenv" target="_blank">virtualenv</a>, an amazing tool. However, I had some difficulties getting Numpy and Scipy properly compiled and included in the virtualenv on my server whereas it was pretty simple to get them up and running in the system's default Python installation. Conversing with some of my more Django-experienced friends, they reassured me that while this wasn't a best practice, it wasn't a mortal sin either.
+
+
+
+
 
 
 
@@ -406,10 +393,6 @@ Add a A record to the DNS record of your domain mapping the domain to the elasti
 Your domain provide should either give you some way to set the A record (the IP address), or it will give you a way to edit the nameservers of your domain.
 
 
-### Need to do Configuration Work ###
-
-sudo vi /etc/apache2/sites-available/default
-plus edit the wsgi.py file
 
 
 
@@ -424,60 +407,8 @@ sudo apt-get install python-virtualenv
 
 sudo pip install -r ./requirements.txt 
 
+## Some Debuggin Hints ##
 
-
-
-
-
-#need to setup appache webserver
-
-
-/home/seanmurphy/myproject/myproject/myproject
-
-
-
-
-
-
-references:
-http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
-
-
-The Django Book
-Deploying Django
-http://www.djangobook.com/en/2.0/chapter12.html
-
-
-
-Complete Single Server Django Stack Tutorial
-http://www.apreche.net/complete-single-server-django-stack-tutorial/
-
-START TO FINISH - SERVING DJANGO WITH UWSGI/NGINX ON EC2
-http://adambard.com/blog/start-to-finish-serving-mysql-backed-django-w/
-
-Non-techie Guide to setting up Django, Apache, MySQL on Amazon EC2
-http://pragmaticstartup.wordpress.com/2011/04/02/non-techie-guide-to-setting-up-django-apache-mysql-on-amazon-ec2/
-
-Deploying Django on Amazon EC2 Server
-http://nickpolet.com/blog/1/
-
-Deploying Python, Django on ec2 linux instance
-http://blog.hguochen.com/blog/2013/09/deploying-python-django-on-ec2-linux-instance/
-
-How to use Django with Apache and mod_wsgi
-https://docs.djangoproject.com/en/1.4/howto/deployment/wsgi/modwsgi/
-
-
-Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL
-http://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/
-
-
-
-
-
-
-
-# New Debug 'cause server ain't working
 
 Is server running?
 sudo service apache2 status
@@ -488,6 +419,37 @@ cat /var/log/apache2/error.log
 gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
 
 gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
+
+
+## References ##
+There are a ton of different tutorials out there that helped me with my work. 
+
+<a href="http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/" target="_blank">Deploy Django on Apache with Virtualenv and mod_wsgi</a>
+
+<a href="http://www.djangobook.com/en/2.0/chapter12.html" target="_blank">The Django Book - Deploying Django, Chapter 12</a>
+
+<a href="http://www.apreche.net/complete-single-server-django-stack-tutorial/" target="_blank">Complete Single Server Django Stack Tutorial</a>
+
+<a href="http://adambard.com/blog/start-to-finish-serving-mysql-backed-django-w/" target="_blank">Start to Finish - Serving Django with UWSGI/NGINX on EC2</a>
+
+<a href="http://pragmaticstartup.wordpress.com/2011/04/02/non-techie-guide-to-setting-up-django-apache-mysql-on-amazon-ec2/" target="_blank">Non-techie Guide to setting up Django, Apache, MySQL on Amazon EC2</a>
+
+<a href="http://nickpolet.com/blog/1/" target="_blank">Deploying Django on Amazon EC2 Server</a>
+
+<a href="http://blog.hguochen.com/blog/2013/09/deploying-python-django-on-ec2-linux-instance/" target="_blank">Deploying Python, Django on EC2 Linux Instance
+
+<a href="https://docs.djangoproject.com/en/1.4/howto/deployment/wsgi/modwsgi/" target="_blank">How to use Django with Apache and mod_wsgi</a>
+
+<a href="http://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/" target="_blank">Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL</a>
+
+
+
+
+
+
+
+
+
 
 
 # Every Deployment

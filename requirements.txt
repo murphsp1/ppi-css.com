@@ -6,6 +6,7 @@ django-extensions==1.2.2
 simplejson==3.3.0
 six==1.4.1
 wsgiref==0.1.2
-numpy==1.7.1
-psycopg2==2.5.1
-scipy==0.12.0
+#Below was commented out when deploying to production
+#numpy==1.7.1
+#psycopg2==2.5.1
+#scipy==0.12.0
