@@ -30,7 +30,6 @@ you will get in trouble copying and pasting code and/or configuration files. How
 
 
 ## Initial Configuration ##
-
 One criticism that I have of **some** of the tutorial blogs that I have seen is that they don't always offer the intimate details of their production environments. I would like to see every technical blog come with a requirements.txt file.
 
 To remedy that, here are all of the sordid details:
@@ -409,7 +408,6 @@ sudo pip install -r ./requirements.txt
 
 ## Some Debuggin Hints ##
 
-
 Is server running?
 sudo service apache2 status
 
@@ -420,6 +418,45 @@ gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
 
 gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
 
+
+## Getting to Know Git and Git Hub ##
+As powerful as GIT can be, I found myself only using a few commands.
+
+First, I used git add with several different flags. To stage all new and modified files (but not deleted files), use:
+
+    git add .
+
+To stage all modified and deleted files (but not new files), use:
+
+    git add -u
+
+Or, if you want to be lazy and want to stage everything everytime (new, modified, and deleted files), use:
+
+    git add -A
+
+Next, the staged files must be committed and then pushed to GitHub.
+
+    git commit -m "insert great string for documentation here"
+    git push -u origin master
+
+
+## Commands to Start App in Local Development Environment ##
+While Django isn't the most lightweight web framework in Python (hello Flask and others), "launching" the site in my local development environment is pretty simple. Compare the command line commands needed below to the rest of the blog. 
+
+Note that I am running OS X 10.9 Mavericks on a Mac Book Air with 8 GB of 1600 MHz DDR 3.
+
+I first start my local postgres server:
+
+    postgres -D /usr/local/var/postgres 
+
+I then start my local development server using the <a href="https://code.google.com/p/django-command-extensions/wiki/RunServerPlus" target="_blank">django-command-extensions</a> that enable some great debugging of your site in the browser.
+
+    python manage.py runserver_plus   
+
+Database migrations are pretty similar to those in production:
+
+    ./manage.py schemamigration css0 --auto
+    ./manage.py migrate css0   
 
 ## References ##
 There are a ton of different tutorials out there that helped me with my work. 

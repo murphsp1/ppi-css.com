@@ -22,5 +22,13 @@ The commands needed to launch various components on the development machine.
 I find I only use the following three commit commands:
 
 	git add .
+
+or
+
+    git add -u
+
+or
+
+    git add -A
 	git commit -m "blah blah blah"
 	git push -u origin master
