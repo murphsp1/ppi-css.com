@@ -1,12 +1,38 @@
-
-
-
 ## Introduction ##
+This very long article, which might get broken down into multiple posts, walks one through the process of deploying a non-standard Django application on a virtual instance provisioned not from Amazon Web Services but from Google Compute Engine. Note that Google Compute Engine is very different from Google App Engine.  
+
+What makes this app "non-standard" is its use of both the numpy and scipy packages to perform fast numeric computations. Numpy and SciPy are based on C and Fortran respectively and both have "more" complicated compilation dependencies. Binaries may be available in some cases but I was most concerned with 
+
+A quick Googling of deploying these  
+
+
+While numpy and scipy are both great, they are often problematic as 
+
 
 General thoughts
 
+
+I wrote this for two very particular reasons.  The first reason is that I believe there is a large gap between available online tutorials that walk you through the deployment of a toy-application and the core documentation that exists for program
+
+I find that the 
 gap in tutorials .. some are too simplistic
 tech manuals and sdks are too technical and abstract
+
+
+
+Second, this is the document I created as I worked my way through this problem.
+gap in tutorials .. some are too simplistic
+tech manuals and sdks are too technical and abstract
+
+
+Numerous tutorials of various depth and extent describe deploying a Django app into various environments. While these tutorials can be helpful, I found their short length somewhat disingenuous 
+
+Also, there is a fundamental disconnect between 
+and the actual process.
+
+A tutorial, with all steps sequentially laid out in detail, is not representative of how things occur in real life.
+
+
 
 be prepared to go through at least a few iterations ... this changes how you should work and think
 
@@ -14,11 +40,19 @@ document everything
 
 you will get in trouble copying and pasting code and/or configuration files. However, understanding everything is not 
 
+## Virtual Environment - Where Did It Go? ##
+If you noticed, I did have a requirements.txt file in my project. When I started doing local development on my trusty Mac Book Air, I used <a href="https://pypi.python.org/pypi/virtualenv" target="_blank">virtualenv</a>, an amazing tool. However, I had some difficulties getting Numpy and Scipy properly compiled and included in the virtualenv on my server whereas it was pretty simple to get them up and running in the system's default Python installation. Conversing with some of my more Django-experienced friends, they reassured me that while this wasn't a best practice, it wasn't a mortal sin either.
 
-## 0. Initial Configuration ##
 
-I have noticed a great deal of tutorial blogs don't offer much in the way of detailed environment specifications used for the tutorial and do no want to go down the same path.
+## Initial Configuration ##
 
+One criticism that I have of **some** of the tutorial blogs that I have seen is that they don't always offer the intimate details of their production environments. I would like to see every technical blog come with a requirements.txt file.
+
+To remedy that, here are all of the sordid details:
+
+
+- gcutil version 1.11.0 - to connect to my GCE instance
+- 
 
 
 static IP = 162.222.181.45
@@ -483,7 +517,3 @@ drwxr-xr-x 3 seanmurphy seanmurphy   4096 Nov 20 15:35 ..
 
 -rw-r--r-- 1 seanmurphy seanmurphy   6148 Nov 20 15:35 .DS_Store
 
-
-Things to fix. Deployments generally suck. Something always breaks. 
-
-Initial table data load is NOT working ... which is really odd.
