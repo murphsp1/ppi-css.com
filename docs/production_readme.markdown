@@ -34,7 +34,7 @@ One criticism that I have of **some** of the tutorial blogs that I have seen is 
 
 To remedy that, here are all of the sordid details:
 
-- gcutil version 1.11.0 - to connect to my GCE instance
+- gcutil version 1.11.0 - to connect to the GCE instance
 - 
 
 
@@ -196,12 +196,7 @@ sudo chown -R www-data:www-data /var/www
 
 
 
-### More References ###
 
-http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/
-
-- <a href="https://developers.google.com/compute/docs/quickstart" target="_blank">A Simple Tutorial for GCE</a> - This is a very basic tutorial that doesn't get into the details of getting a very simple configuration up and running on GCE. 
-- <a href="http://www.control-escape.com/web/configuring-apache2-debian.html" target="_blank">Some Background on Apache Configuration Files on Debian</a> - Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  
 
 
 ## Setup the Overall Directory Structure on the Remote Server ##
@@ -374,6 +369,57 @@ From the command line in the directory with "manage.py" type:
 
 
 
+
+
+
+
+# Every Deployment
+
+need to restart apache2
+    
+    sudo service apache2 restart
+    
+    ./manage.py schemamigration css0 --auto
+    s  
+
+
+log in and drop the table in the database
+
+    mysql -u root -pPASSWORD -h HOSTNAMEORIP django_test
+
+    drop table _______;
+css0_scores
+
+need to give permission to write to the directory for the user that will be writing files
+
+drwxrwxrwx 2 seanmurphy seanmurphy   4096 Nov 20 18:51 .
+
+drwxr-xr-x 3 seanmurphy seanmurphy   4096 Nov 20 15:35 ..
+
+-rw-r--r-- 1 **www-data   www-data   136748 Nov 20 18:51 1FC2.pdb**
+
+-rw-r--r-- 1 seanmurphy seanmurphy   6148 Nov 20 15:35 .DS_Store
+
+
+
+## Some Debuggin Hints ##
+
+Inevitably, things won't work on your remote server. Obviously leaving your application in Debug mode is ok for a very brief time while you are trying to deploy but there are other things to check as well.
+
+
+Is server running?
+sudo service apache2 status
+
+What do the apache error logs say?
+cat /var/log/apache2/error.log
+
+Also, it is never a bad idea to log into MySQL and take a look at the django_test database
+
+gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
+
+gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
+
+
 ## Virtual Environment - Where Did It Go? ##
 If you noticed, I did have a requirements.txt file in my project. When I started doing local development on my trusty Mac Book Air, I used <a href="https://pypi.python.org/pypi/virtualenv" target="_blank">virtualenv</a>, an amazing tool. However, I had some difficulties getting Numpy and Scipy properly compiled and included in the virtualenv on my server whereas it was pretty simple to get them up and running in the system's default Python installation. Conversing with some of my more Django-experienced friends, they reassured me that while this wasn't a best practice, it wasn't a mortal sin either.
 
@@ -394,35 +440,12 @@ Your domain provide should either give you some way to set the A record (the IP 
 
 
 
-
-
-
-#need to remove scipy and numpy from requirements file
-#otherwise they really don't seem to install properly
-#also, must install psycopg2 separately
-
-sudo apt-get install python-virtualenv
-
-
-sudo pip install -r ./requirements.txt 
-
-## Some Debuggin Hints ##
-
-Is server running?
-sudo service apache2 status
-
-What do the apache error logs say?
-cat /var/log/apache2/error.log
-
-gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
-
-gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
-
-
 ## Getting to Know Git and Git Hub ##
-As powerful as GIT can be, I found myself only using a few commands.
+Git or another code versioning tool is a fact of life for any developer. While the learning curve for the novice may be steep (or vertical), it is essential to climb this mountain as quickly as possible.
 
-First, I used git add with several different flags. To stage all new and modified files (but not deleted files), use:
+As powerful as GIT can be, I found myself using only a few commands.
+
+First, I used git add with several different flags to stage files before committing. To stage all new and modified files (but not deleted files), use:
 
     git add .
 
@@ -441,15 +464,13 @@ Next, the staged files must be committed and then pushed to GitHub.
 
 
 ## Commands to Start App in Local Development Environment ##
-While Django isn't the most lightweight web framework in Python (hello Flask and others), "launching" the site in my local development environment is pretty simple. Compare the command line commands needed below to the rest of the blog. 
+While Django isn't the most lightweight web framework in Python (hello Flask and others), "launching" the site in the local development environment is pretty simple. Compare the command line commands needed below to the rest of the blog. (Note that I am running OS X 10.9 Mavericks on a Mac Book Air with 8 GB of 1600 MHz DDR 3.)
 
-Note that I am running OS X 10.9 Mavericks on a Mac Book Air with 8 GB of 1600 MHz DDR 3.
-
-I first start my local postgres server:
+First, start the local postgres server:
 
     postgres -D /usr/local/var/postgres 
 
-I then start my local development server using the <a href="https://code.google.com/p/django-command-extensions/wiki/RunServerPlus" target="_blank">django-command-extensions</a> that enable some great debugging of your site in the browser.
+Next start the local development web server using the <a href="https://code.google.com/p/django-command-extensions/wiki/RunServerPlus" target="_blank">django-command-extensions</a> that enables debugging of the site in the browser.
 
     python manage.py runserver_plus   
 
@@ -459,7 +480,13 @@ Database migrations are pretty similar to those in production:
     ./manage.py migrate css0   
 
 ## References ##
-There are a ton of different tutorials out there that helped me with my work. 
+There are a ton of different tutorials out there to help you with all aspects of deployment. Of course, piecing together the relevant parts may take some time.
+
+<a href="https://developers.google.com/compute/docs/quickstart" target="_blank">A Simple Tutorial for GCE</a> - This is a very basic tutorial that doesn't get into the details of getting a very simple configuration up and running on GCE. 
+
+<a href="http://www.control-escape.com/web/configuring-apache2-debian.html" target="_blank">Some Background on Apache Configuration Files on Debian</a> - Understanding the apache2 configuration files is important for getting this to work correctly and it would appear that Debian does things a bit non-standard.  
+
+<a href="https://library.linode.com/web-servers/apache/installation/debian-7-wheezy" target="_blank">Apache 2 Web Server on Debian 7 (Wheezy)</a>
 
 <a href="http://thecodeship.com/deployment/deploy-django-apache-virtualenv-and-mod_wsgi/" target="_blank">Deploy Django on Apache with Virtualenv and mod_wsgi</a>
 
@@ -478,41 +505,3 @@ There are a ton of different tutorials out there that helped me with my work.
 <a href="https://docs.djangoproject.com/en/1.4/howto/deployment/wsgi/modwsgi/" target="_blank">How to use Django with Apache and mod_wsgi</a>
 
 <a href="http://michal.karzynski.pl/blog/2013/06/09/django-nginx-gunicorn-virtualenv-supervisor/" target="_blank">Setting up Django with Nginx, Gunicorn, virtualenv, supervisor and PostgreSQL</a>
-
-
-
-
-
-
-
-
-
-
-
-# Every Deployment
-
-need to restart apache2
-	
-	sudo service apache2 restart
-	
-	./manage.py schemamigration css0 --auto
-	s  
-
-
-log in and drop the table in the database
-
-	mysql -u root -pPASSWORD -h HOSTNAMEORIP django_test
-
-	drop table _______;
-css0_scores
-
-need to give permission to write to the directory for the user that will be writing files
-
-drwxrwxrwx 2 seanmurphy seanmurphy   4096 Nov 20 18:51 .
-
-drwxr-xr-x 3 seanmurphy seanmurphy   4096 Nov 20 15:35 ..
-
--rw-r--r-- 1 **www-data   www-data   136748 Nov 20 18:51 1FC2.pdb**
-
--rw-r--r-- 1 seanmurphy seanmurphy   6148 Nov 20 15:35 .DS_Store
-
