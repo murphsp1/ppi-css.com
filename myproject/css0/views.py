@@ -85,7 +85,8 @@ def get_table_data(request):
     # construct a list which will contain all of the data for the response
     to_json = []
     for score in scores:
-        to_json.append([score.name, score.interface, "{0:.2f}".format(score.score)])
+        if not(score.uploaded):
+            to_json.append([score.name, score.interface, "{0:.2f}".format(score.score)])
 
     # convert the list to JSON
     response_data = simplejson.dumps({"aaData" : to_json})
