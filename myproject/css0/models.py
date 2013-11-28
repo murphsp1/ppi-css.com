@@ -4,8 +4,8 @@ from django.utils.timezone import utc
 import datetime
 
 class Document(models.Model):
-    docfile = models.FileField(upload_to='documents/')
-
+	docfile = models.FileField(upload_to='documents/')
+	date_uploaded = models.DateTimeField(default = datetime.datetime.utcnow().replace(tzinfo=utc))
 
 class Scores(models.Model):
 	name = models.CharField(max_length=30)
