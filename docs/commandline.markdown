@@ -13,6 +13,7 @@ The commands needed to launch various components on the development machine.
 
 ## Database Migrations:
 
+Once a model has changed, we needed to make a migration using South and then apply it with the two commands below:
 
 	./manage.py schemamigration css0 --auto
 	./manage.py migrate css0   

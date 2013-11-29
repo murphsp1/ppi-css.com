@@ -463,7 +463,7 @@ Next, the staged files must be committed and then pushed to GitHub.
     git push -u origin master
 
 
-## Commands to Start App in Local Development Environment ##
+## Commands in Local Development Environment ##
 While Django isn't the most lightweight web framework in Python (hello Flask and others), "launching" the site in the local development environment is pretty simple. Compare the command line commands needed below to the rest of the blog. (Note that I am running OS X 10.9 Mavericks on a Mac Book Air with 8 GB of 1600 MHz DDR 3.)
 
 First, start the local postgres server:
@@ -474,7 +474,8 @@ Next start the local development web server using the <a href="https://code.goog
 
     python manage.py runserver_plus   
 
-Database migrations are pretty similar to those in production:
+
+Once a model has changed, we needed to make a migration using South and then apply it with the two commands below:
 
     ./manage.py schemamigration css0 --auto
     ./manage.py migrate css0   
