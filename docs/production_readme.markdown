@@ -1,30 +1,40 @@
 ## Introduction ##
-This very long article, which might get broken down into multiple posts, walks one through the process of deploying a non-standard Django application on a virtual instance provisioned not from Amazon Web Services but from Google Compute Engine. Note that Google Compute Engine is very different from Google App Engine.  
+This longer-than-initially planned article walks one through the process of deploying a non-standard Django application on a virtual instance provisioned not from Amazon Web Services but from Google Compute Engine. This means we will be creating our own virtual machine in the cloud and installing all necessary software to have it serve content, run the Django application, and hanlde the database all in one. Clearly, I do not expect an overwhelming amount of traffic to this site. Also, note that Google Compute Engine is very different from Google App Engine.  
 
-What makes this app "non-standard" is its use of both the numpy and scipy packages to perform fast numeric computations. Numpy and SciPy are based on C and Fortran respectively and both have "more" complicated compilation dependencies. Binaries may be available in some cases but not always for your preferred deployment environmet. Most importantly, these two libraries prevented me from deploying my app to either Google App Engine (GAE) or to Heroku. Based on limited Googling, I am guessing that I might have been able to deploy (eventually) to Heroku with some extra work but I think the probability of success with GAE would have been even lower.
+What makes this app "non-standard" is its use of both the Numpy and Scipy packages to perform fast computations. Numpy and Scipy are based on C and Fortran respectively and both have complicated compilation dependencies. Binaries may be available in some cases but are not always available for your preferred deployment environment. Most importantly, these two libraries prevented me from deploying my app to either Google App Engine (GAE) or to Heroku. I'm not saying that it is impossible to deploy Numpy- or Scipy-dependent apps on either service. However, neither service supports apps dependent on both Scipy and Numpy out-of-the-box although a limited amount of Googling suggests it can be be done.
 
-In fact, GAE could have been an ideal solution if I had re-architected my app, separating the Django application from the computational code. I could have run the Django application on GAE and allowed the app to spin up a GCE instance as needed to perform the numeric computations. If the project deadline had not been so tight, I would go down this path for version 2.0.
+In fact, GAE could have been an ideal solution if I had re-architected my app, separating the Django application from the computational code. I could run the Django application on GAE and allowed it to spin up a GCE instance as needed to perform the computations. One concern with this idea is the latency involved in spinning up the virtual instance for computation.  Google Compute Engine instances spring to life quickly but not instantaneously. Maybe I'll go down this path for version 2.0 if there is a need.
 
-## Philosophy ##
-As you will notice, this post is a bit long and I wrote it for two very particular reasons.  First, I believe that a large gap exists between available online tutorials that walk you through the deployment of a toy-application and the core documentation that exists for programming languages and web frameworks. The tutorials are often so simple that they do not prepare you for the pitfalls and mandatory debugging that the novice or expert will often face. The core documentation is fantastic for the expert that already has a good understanding of how the larger pieces fit together. However, it is often very difficult to formulate the next question one must ask after reading the documention--you simply don't know what you don't know.
+## Motivations ##
+I wrote this post for two primary reasons, one ideological and one practical.  First, I believe that a large gap exists between available online tutorials that walk you through the deployment of a toy-application and the core documentation that exists for programming languages and web frameworks. 
 
-Please note that this isn't to disparage the efforts of the tutorial writers or the language documenters in any way (Thank you for your efforts) and I won't speculate on the origins of this divide.
+### Tutorials vs Documentation
+An ideal tutorial should be simple enough not to lose the novice but, by doing so, often does not prepare one for the pitfalls and mandatory debugging that the novice or expert will face. Further, a tutorial, with all steps sequentially laid out in detail for clarity, is not representative of how exploration occurs in the real world.
 
-Second, this is the document that I created as I worked my way through the deployment. 
+The core documentation is fantastic for the expert that already has a good understanding of how the larger pieces fit together. However, the core documentation obviously can't cover everything that one needs to know and must make numerous assumptions about a person's related skill set and mental models. Further, it is often very difficult to formulate the next question one must ask after reading the documention--you simply don't know what you don't know. Sample code that shows you how a particular example is implemented can be useful to help formulate this next question but it can also be a crutch, solving the immediate problem without 
+
+Please note that this isn't to disparage the efforts of the tutorial writers or the language documenters in any way (thank you for your efforts).
+
+### Practical Needs
+Second, this is the document that I created as I worked my way through the deployment process. As I went, I found myself continually assembling information from a large variety of sources--both online and person-to-person--each of which either only partially applicable to my particular problem or addressing a small segment of the whole. Thus, there is an immediate intent to help the reader with any related problems.
+
+More importantly, and wandering back to the philosophical side of the coin, this is my stab at bridging the gap between the too-simple-tutorials and the API documentation: capturing my thought process, the good and the bad, the right and the wrong, and exposing the particular set of attempts, failures, frustrations, and iterations that led me to the outcome that you will read about below (if you have the required stamina;). 
+
+## Big Picture Lessons Learned ##
+
+The single largest takeaway from this experience was the elusively obvious statement--be prepared to run through the process at least a few times. I don't think that most people expect to get something that they have never done before right the first time. However, I don't think that the full ramifications of this fact are appreciated until further reflection.
 
 
-Numerous tutorials of various depth and extent describe deploying a Django app into various environments. While these tutorials can be helpful, I found their short length somewhat disingenuous 
+First, if the project is lengthy and complex or the work will be punctuated with numerous distractions, 
 
+First, let's assume that the project is either lengthy or complex or that the work will be punctuated with numerous distractions.
+Thus, each time you start over, you must repeat a set of steps, possibly in different programming languages, that were at least somewhat unknown to you before. 
 
+recording the details of each and every step simply make it possible to recreate rapidly the progress to that point. Trust me, you probably will not remember the particular set of required flags for each command line entry you need to get everything working, especially when you got those flags wrong the first 5 or 6 times you tried. Either  
 
-A tutorial, with all steps sequentially laid out in detail, is not representative of how things occur in real life.
+Second, when a particular step goes south (and at least one will), your documentation can become a spring board for working out your problem. Did you miss a step? Did you screw up a previous step? Did you 
 
-
-be prepared to go through at least a few iterations ... this changes how you should work and think
-
-document everything
-
-you will get in trouble copying and pasting code and/or configuration files. However, understanding everything is not 
+When I taught more group classes, I had an "unlimited email" policy. I would answer any and every question emailed to me if the student followed a simple set of rules. I refused to answer any email that was simply a plee for help. The "I just don't get this problem" one line email got an equally short reply to the student.  For me to answer, the student must explain in writing the set of steps that got him or her to the current blocked state, the specific error or mistake that occurred, and some guesses as to what might have gone wrong. More often than not, the simple act of writing out this email was enough for the student to push forward. Make your assumptions explicit and often the problem will become self evident.
 
 
 
@@ -38,10 +48,10 @@ To remedy that, here are all of the sordid details:
 - 
 
 
-static IP = 162.222.181.45
 
+## Google Compute Engine
+I will assume that you can provision your own instance in GCE either using gcutil at the command line or through the cloud services web interface provided by Google.
 
-## GCE - Only Need to Do 
 #need to configure GCE firewall settings
 gcutil addfirewall http2 --description="Incoming http allowed." --allowed="tcp:http" --project="1040981951502"
 

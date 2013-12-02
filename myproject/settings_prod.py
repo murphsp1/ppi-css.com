@@ -15,7 +15,7 @@ PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 ### </CUSTOM SETTINGS> ###
 
 DEBUG = False
-#TEMPLATE_DEBUG = DEBUG
+TEMPLATE_DEBUG = False
 
 ADMINS = (
     ('Sean Murphy', 'murphsp1@gmail.com'),
