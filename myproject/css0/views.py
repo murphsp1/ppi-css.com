@@ -29,17 +29,15 @@ def upload(request):
                 newdoc = Document(docfile = request.FILES['docfile'])
                 newdoc.save()
 
-                
                 path = settings.MEDIA_ROOT
                 file_and_path = path + '/documents/' + filename
 
-                print(file_and_path)
-
+                #print(file_and_path)
                 try:
                     output_tuple = mu_pot.scoreOne(file_and_path)
-                    print('PDB Name = ' + output_tuple[0])
-                    print('PDB Interface = ' + output_tuple[1])
-                    print('EST DeltaG = '+ str(output_tuple[2]) )
+                    #print('PDB Name = ' + output_tuple[0])
+                    #print('PDB Interface = ' + output_tuple[1])
+                    #print('EST DeltaG = '+ str(output_tuple[2]) )
                     newscore = Scores(name = output_tuple[0], score = output_tuple[2], interface=output_tuple[1], uploaded=True)
                     newscore.save()
                     success=True
@@ -49,7 +47,6 @@ def upload(request):
 
             else:
                 error_message = "The file uploaded had the wrong extension."  
-
 
                 # Redirect to the document list after POST
                 #return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
@@ -61,9 +58,7 @@ def upload(request):
     #documents = Document.objects.all()
 
     scores = None
-    #print('Sean LOOK HERE!!!!')
     if (success):
-        #scores = Scores.objects.all().order_by('date_uploaded').reverse()[:1]
         scores = Scores.objects.latest('id')
         scores = [scores]
         print(scores)
@@ -71,7 +66,6 @@ def upload(request):
     # Render list page with the documents and the form
     return render_to_response(
         'css0/upload.html',
-        #{'documents': documents, 'form': form},
         {'scores': scores, 'form': form, 'error_message':error_message},
         context_instance=RequestContext(request)
     )
