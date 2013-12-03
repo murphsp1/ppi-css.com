@@ -17,31 +17,42 @@ from django.conf import settings
 def upload(request):
     # Handle file upload
     success = False
+    error_message = None
+
     if request.method == 'POST':
         form = DocumentForm(request.POST, request.FILES)
         if form.is_valid():
-            newdoc = Document(docfile = request.FILES['docfile'])
-            newdoc.save()
 
-
-            #newscore = Scores(name = 'test', score = 999.1, interface='A:YourMom')
-            #newscore.save()
             filename = request.FILES['docfile'].name
-            path = settings.MEDIA_ROOT
-            file_and_path = path + '/documents/' + filename
-            print(file_and_path)
-            #asa.main_function(file_and_path)
 
-            output_tuple = mu_pot.scoreOne(file_and_path)
-            print('PDB Name = ' + output_tuple[0])
-            print('PDB Interface = ' + output_tuple[1])
-            print('EST DeltaG = '+ str(output_tuple[2]) )
-            newscore = Scores(name = output_tuple[0], score = output_tuple[2], interface=output_tuple[1], uploaded=True)
-            newscore.save()
-            success=True
+            if ( filename[-3:].upper() == 'PDB'):
+                newdoc = Document(docfile = request.FILES['docfile'])
+                newdoc.save()
 
-            # Redirect to the document list after POST
-            #return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
+                
+                path = settings.MEDIA_ROOT
+                file_and_path = path + '/documents/' + filename
+
+                print(file_and_path)
+
+                try:
+                    output_tuple = mu_pot.scoreOne(file_and_path)
+                    print('PDB Name = ' + output_tuple[0])
+                    print('PDB Interface = ' + output_tuple[1])
+                    print('EST DeltaG = '+ str(output_tuple[2]) )
+                    newscore = Scores(name = output_tuple[0], score = output_tuple[2], interface=output_tuple[1], uploaded=True)
+                    newscore.save()
+                    success=True
+
+                except:
+                    error_message = "There was an error during the computation, probably due to a problem with the PDB file."
+
+            else:
+                error_message = "The file uploaded had the wrong extension."  
+
+
+                # Redirect to the document list after POST
+                #return HttpResponseRedirect(reverse('myproject.css0.views.upload'))
             
     else:
         form = DocumentForm() # A empty, unbound form
@@ -49,10 +60,8 @@ def upload(request):
     # Load documents for the list page
     #documents = Document.objects.all()
 
-    #print(scores)
     scores = None
-    print('Sean LOOK HERE!!!!')
-    print(success)
+    #print('Sean LOOK HERE!!!!')
     if (success):
         #scores = Scores.objects.all().order_by('date_uploaded').reverse()[:1]
         scores = Scores.objects.latest('id')
@@ -63,7 +72,7 @@ def upload(request):
     return render_to_response(
         'css0/upload.html',
         #{'documents': documents, 'form': form},
-        {'scores': scores, 'form': form},
+        {'scores': scores, 'form': form, 'error_message':error_message},
         context_instance=RequestContext(request)
     )
 

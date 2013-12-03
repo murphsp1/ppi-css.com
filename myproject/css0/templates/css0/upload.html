@@ -30,6 +30,14 @@
 				<p><input class="btn btn-large btn-primary" type="submit" value="Upload" /></p>
 			</form>
 
+			{% if error_message %}
+			<div class="alert alert-error">
+				<h2>Error!</h2>
+				<p> {{ error_message }} </p>
+
+			</div>
+			{% endif %}
+
 			{% if scores %}
 			<div class="alert alert-success">
 				<h2>Your PDB was successfully uploaded.</h2>
