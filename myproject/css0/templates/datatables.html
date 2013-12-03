@@ -1,25 +1,3 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-
-
-{% block search %}active{% endblock %}
-
-
-{% block primary %}
-
-				<div class="row" id = "search">
-					<div class="span10 offset1">
-						<h2>Search the Database for a Precomputed Score</h2>
-						<div id="dynamic"></div>
-						<div class="spacer"></div>
-					</div>
-				</div>	
-	
-{% endblock %}
-
-
-{% block javascript %}
-
 <script type="text/javascript">
 
 $(document).ready(function() {
@@ -41,5 +19,3 @@ $(document).ready(function() {
 });
 
 </script>
-	
-{% endblock %}
