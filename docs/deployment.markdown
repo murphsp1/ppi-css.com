@@ -16,6 +16,12 @@ Now, after shuffling directories around, I:
 
 make sure that wsgi.py gets updated
 
+
+[Tue Dec 03 15:54:33 2013] [error] OperationalError: (1045, "Access denied for user 'root'@'localhost' (using password: NO)")
+[Tue Dec 03 15:56:38 2013] [error] Internal Server Error: /css0/get_table_data/
+
+
+
 Now, debug = True doesn't work
 Search does not work
 

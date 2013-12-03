@@ -417,6 +417,9 @@ sudo service apache2 status
 What do the apache error logs say?
 cat /var/log/apache2/error.log
 
+
+cat /var/www/ppi-css.com/logs/error.log 
+
 Also, it is never a bad idea to log into MySQL and take a look at the django_test database
 
 gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
