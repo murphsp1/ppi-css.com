@@ -377,12 +377,6 @@ but need to update the original source to have a proper path
 From the command line in the directory with "manage.py" type:
 
 
-
-
-
-
-
-
 # Every Deployment
 
 need to restart apache2

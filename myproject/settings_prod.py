@@ -14,8 +14,8 @@ import os
 PROJECT_ROOT = os.path.realpath(os.path.dirname(__file__))
 ### </CUSTOM SETTINGS> ###
 
-DEBUG = False
-TEMPLATE_DEBUG = False
+DEBUG = True
+TEMPLATE_DEBUG = True
 
 ADMINS = (
     ('Sean Murphy', 'murphsp1@gmail.com'),

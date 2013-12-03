@@ -17,10 +17,14 @@ import os
 import sys
 import site
 
-sys.path.append('/home/seanmurphy/myproject/myproject')
-sys.path.append('/home/seanmurphy/myproject')
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings")
+sys.path.append('/var/www/ppi-css.com/django/ppi-css.com/myproject')
+sys.path.append('/var/www/ppi-css.com/django/ppi-css.com')
+
+#sys.path.append('/home/seanmurphy/myproject/myproject')
+#sys.path.append('/home/seanmurphy/myproject')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "myproject.settings_prod")
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
