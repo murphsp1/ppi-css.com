@@ -379,6 +379,10 @@ From the command line in the directory with "manage.py" type:
 
 # Every Deployment
 
+
+
+
+
 need to restart apache2
     
     sudo service apache2 restart
@@ -425,6 +429,10 @@ Also, it is never a bad idea to log into MySQL and take a look at the django_tes
 gcutil --project="1040981951502" pull test2 /home/seanmurphy/myproject.tar.gz ./
 
 gcutil --service_version="v1beta16" --project="1040981951502" ssh  --zone="europe-west1-a" "test2"
+
+
+mysql -u root -p django_test
+GRANT all privileges on django_test.* to 'root'@'localhost' WITH GRANT OPTION;
 
 
 ## Virtual Environment - Where Did It Go? ##

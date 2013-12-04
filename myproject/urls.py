@@ -14,4 +14,7 @@ urlpatterns = patterns('',
 	(r'^admin/', include(admin.site.urls)),
 	url(r'^404/$', TemplateView.as_view(template_name="404.html"), name="404"),
     url(r'^500/$', TemplateView.as_view(template_name="500.html"), name="500"),
-) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+) 
+
+if settings.DEBUG:
+	urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
