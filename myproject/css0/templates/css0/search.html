@@ -33,7 +33,8 @@ $(document).ready(function() {
 		"sDom": 'T<"clear">lfrtip',	  			
 		//"aaData": aDataSet,
 		"oTableTools": {
-		"sSwfPath": "{% static "media/swf/copy_csv_xls.swf" %}"
+			"sSwfPath": "{% static 'media/swf/copy_csv_xls.swf' %}",
+			"aButtons": [ "copy", "csv" ,"print" ]
 	},
 		"aoColumns": [
 		{ "sTitle": "PDB" , "sClass": "center"},

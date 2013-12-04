@@ -97,7 +97,7 @@ def get_table_data(request):
     # return an HttpResponse with the JSON and the correct MIME type
     return HttpResponse(response_data, mimetype='application/json')
 
-
+'''
 def init_table_data_load(request):
     import csv
     #For production
@@ -113,5 +113,6 @@ def init_table_data_load(request):
 
     data_file.close()
     return HttpResponse("<h1>Data Uploaded Successfully</h1>")
+'''
 
 
